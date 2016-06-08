@@ -124,7 +124,7 @@ SearchResults <- cbind(SearchVars, Matches, stringsAsFactors = as.data.frame.AsI
 
 # For multiple matches, determine which are relevent, and pull from raw data
 # From vector of multiple matches (MMatches), pull variable names which are relevent
-MMvars <- MMatches[c(1,3,7)]  #NOTE:  this is specific to CUVA; no rules set to filter and automate
+MMvars <- MMatches[c(1,4,7)]  #NOTE:  this is specific to CUVA; no rules set to filter and automate
 
 # Subset those vars from raw data frame; include "ID" for merging to matched set of variables
 MMvars <- CUVA[c(c(MMvars), "ID")]
