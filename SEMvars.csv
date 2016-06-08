@@ -3,6 +3,7 @@ groupID,ID
 local,LiveNearby
 international,a_Zip
 entries,ReEnter
+DKentries,DKReEnter
 overnight,Overnight
 nightsBackcountry,CampingBackcountry
 nightsCampIn,CampingInPark
