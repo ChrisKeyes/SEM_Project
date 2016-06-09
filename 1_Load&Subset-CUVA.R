@@ -46,6 +46,7 @@ for (x in Parklist) {
         park <- NULL
 }
 
+
 ################################################################################################
 
 # Choose data set to work with 
@@ -54,6 +55,8 @@ for (x in Parklist) {
 DataNameVector  #If we loop, can use this vector of park names
 
 # **** NEED to add a function or script to verify unique ID's within each data set ****
+      # ERRORS <- which(duplicated(PARKsem$ID) == TRUE)
+      # PARKsem[c(ERRORS),]
 
 ################################################################################################
 # - Subset data to define and create visitor segments
@@ -146,6 +149,11 @@ colnames(CUVAsem) <- SearchVars[c((which(Matches == TRUE)))]
 
 # Lastly, merge the data frames (filtered multiple matches from MMvars to CUVAsem, by "ID")
   CUVAsem <- merge(CUVAsem, MMvars, by = c("ID"))
+ 
+  x <- NULL
+  t <- NULL
+  TempVars <- NULL
+  Varnames <- NULL
   
 ################################################################################################
 # End of script - Move to cleaning script
