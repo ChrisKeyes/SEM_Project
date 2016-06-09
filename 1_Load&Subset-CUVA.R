@@ -53,6 +53,8 @@ for (x in Parklist) {
 
 DataNameVector  #If we loop, can use this vector of park names
 
+# **** NEED to add a function or script to verify unique ID's within each data set ****
+
 ################################################################################################
 # - Subset data to define and create visitor segments
 
