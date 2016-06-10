@@ -20,7 +20,7 @@ source("~/SEM_Project/Script/getSEMvars.r")
 # source("~/SEM_Project/Script/SearchNames.r")  *** delete if not used ***
 
 # Convert .xls data to .csv
-### do we want to automate this within VBA?
+### do we want to automate this within VBA? #Cathy thoughts: I think we can just save our raw data as .csv
 
 # Import data
 # Set working directory to the data folder
@@ -59,7 +59,9 @@ DataNameVector  #If we loop, can use this vector of park names
       # PARKsem[c(ERRORS),]
 
 ################################################################################################
-# - Subset data to define and create visitor segments
+# - Subset data to define and create visitor segments 
+#Cathy: I would suggest that we subset the data to 
+#pull all of the relevant visitor spending questions
 
 #create vector of all varnames for current park
 Varnames <- colnames(CUVA)
