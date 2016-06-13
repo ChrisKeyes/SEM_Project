@@ -1,50 +1,50 @@
-SEMvars,NumberChecks,Notes
-LiveNearby,1,
-a_Zip,3,"NULL, string length < 5 , non-numeric"
-ReEnter,2,"NA,  ReEnter == 0"
-DKReEnter,,
-Overnight,1,NA
-CampingBackcountry,,
-CampingInPark,,
-CampingOutPark,,
-LodgingInPark,,
-LodgingOutPark,,
-Cruise,,
-OtherAccomdations,,
-HoursinPark,1,NA
-DaysinPark,1, DaysinPark > 14
-package,,
-daysPackage,,
-costPackage,,
-numPeoplePackage,,
-airTransPackage,,
-groundTransPackage,,
-waterTransPackage,,
-lodgePackage,,
-mealsPackage,,
-guidePackage,,
-feesPackage,,
-gearPackage,,
-admissionPackage,,
-otherPackage,,
-Entrance999,,
-Gas,,
-RentalCar,,
-PublicTransportation,,
-Restaurants,,
-Snacks,,
-Groceries,,
-Hotels,,
-EquipmentRental,,
-SpecialtyLodge999,,
-Camping,,
-Recreation,,
-Souvenirs,,
-Guide999,,
-Railroad,,
-Tours,,
-OtherExpen,,
-AdditionalExpen999,,
-TotalExpenditures,,
-AdultsCovered,,
-ChildrenCovered,,
+SEMvars,NumberChecks,Check,Note
+LiveNearby,1,NA,Check for NA (i.e. blank)
+a_Zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
+ReEnter,2,"NA,  ReEnter == 0",
+DKReEnter,,,
+Overnight,1,NA,Check for NA (i.e. blank)
+CampingBackcountry,1,NA,Check for NA if overnight ==1
+CampingInPark,1,NA,Check for NA if overnight ==1
+CampingOutPark,1,NA,Check for NA if overnight ==1
+LodgingInPark,1,NA,Check for NA if overnight ==1
+LodgingOutPark,1,NA,Check for NA if overnight ==1
+Cruise,,,
+OtherAccomdations,,,
+HoursinPark,1,NA,
+DaysinPark,1, DaysinPark > 14,
+package,,,
+daysPackage,,,
+costPackage,,,
+numPeoplePackage,,,
+airTransPackage,,,
+groundTransPackage,,,
+waterTransPackage,,,
+lodgePackage,,,
+mealsPackage,,,
+guidePackage,,,
+feesPackage,,,
+gearPackage,,,
+admissionPackage,,,
+otherPackage,,,
+Entrance999,,,
+Gas,1,NA,Check for NA (i.e. blank)
+RentalCar,1,NA,Check for NA (i.e. blank)
+PublicTransportation,1,NA,Check for NA (i.e. blank)
+Restaurants,1,NA,Check for NA (i.e. blank)
+Snacks,1,NA,Check for NA (i.e. blank)
+Groceries,1,NA,Check for NA (i.e. blank)
+Hotels,1,NA,Check for NA (i.e. blank)
+EquipmentRental,1,NA,Check for NA (i.e. blank)
+SpecialtyLodge999,1,NA,Check for NA (i.e. blank)
+Camping,1,NA,Check for NA (i.e. blank)
+Recreation,1,NA,Check for NA (i.e. blank)
+Souvenirs,1,NA,Check for NA (i.e. blank)
+Guide999,1,NA,Check for NA (i.e. blank)
+Railroad,1,NA,Check for NA (i.e. blank)
+Tours,1,NA,Check for NA (i.e. blank)
+OtherExpen,1,NA,Check for NA (i.e. blank)
+AdditionalExpen999,,,
+TotalExpenditures,,,
+AdultsCovered,1,AdultsCovered <= NumAdults,Do we want to check this?
+ChildrenCovered,1,ChildrenCovered <= NumChild,
