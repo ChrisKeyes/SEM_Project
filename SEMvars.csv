@@ -20,7 +20,7 @@ equallyNearby,b_Nearby,Q30b_Nearby
 incidentalNearby,PrimaryLoc,Q30c_PrimaryLoc
 otherNPS,OtherNPS,Q31_OtherNPS
 otherNPSunits,OtherNPSCoded,Q31b_OtherNPSCoded
-entries,ReEnter,Q32a_ReEnter
+entries,a_ReEnter,Q32a_ReEnter
 DKentries,DKReEnter,Q32b_DKReEnter
 package,package,
 daysPackage,daysPackage,
@@ -46,7 +46,7 @@ expGroceries,Groceries,Q33e_Groceries
 expHotels,Hotels,Q33f_Hotels
 expEqpRental,EquipRental,Q33j_EquipRental
 expSpecLodge,Camping,Q33g_Camping
-expcamp,Camping,
+expcamp,Camping999,
 expRec,Recreation,Q33h_Recreation
 expSouvenirs,Souvenirs,Q33i_Souvenirs
 expGuides,Guide999,
