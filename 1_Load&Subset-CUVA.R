@@ -131,14 +131,18 @@ SearchResults <- cbind(SearchVars, Matches, stringsAsFactors = as.data.frame.AsI
 
 # For multiple matches, determine which are relevent, and pull from raw data
 # From vector of multiple matches (MMatches), pull variable names which are relevent
-MMvars <- MMatches[c(1,4,7)]  #NOTE:  this is specific to CUVA; no rules set to filter and automate
+
+#***************************************************************************************************************
+MMvars <- MMatches[c(1,3,6,9)]  #NOTE:  this is specific to CUVA; no rules set to filter and automate
+#NOTE:  If we change search variables, we need to check the vector above to verify it collects the correct variables
 
 # Subset those vars from raw data frame; include "ID" for merging to matched set of variables
 MMvars <- CUVA[c(c(MMvars), "ID")]
 
 # Rename the columns to the search terms for consistancy
 MMvarNames <- paste(as.character(SearchVars[c((which(is.na(Matches))))]))
-    colnames(MMvars)[1:3] <- c(MMvarNames)
+  l <- length(MMvars) - 1
+    colnames(MMvars)[1:c(l)] <- c(MMvarNames)
 
 # For unique matches, pull the column from the dataset and save as dataframe named PARKsem
 CUVAsem <- CUVA[c(ParkVars)]   
