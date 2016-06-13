@@ -13,7 +13,7 @@ PARKsem <- CUVAsem
 ###################################################################################################
 # Upload the CHECKvars csv and store as "CHECKvars"
 CHECKvars <- read.csv("~/SEM_Project/CHECKVars.csv")
-    CHECKvars <- CHECKvars[,c("SEMvars","NumberChecks")]  #drop the notes column
+   ### CHECKvars <- CHECKvars[,c("SEMvars","NumberChecks")]  #drop the notes column
       row.names(CHECKvars) <- CHECKvars$SEMvars
 
 # Drop SEMvars which PARKsem does not contain
