@@ -2,16 +2,16 @@ SEMvars,NumberChecks,Check,Note
 LiveNearby,1,NA,Check for NA (i.e. blank)
 a_Zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
 ReEnter,2,"NA,  ReEnter == 0",
-DKReEnter,,,
+DKReEnter,,,REFER TO PRACTICE SCRIPT FOR RELATIONSHIP TO REENTER
 Overnight,1,NA,Check for NA (i.e. blank)
-CampingBackcountry,1,NA,Check for NA if overnight ==1
+CampingBackcountry,1,NA,Check for NA if overnight ==1; AT LEAST ONE CAT SHOULD BE >= 1 (NOT ALL ZEROS)
 CampingInPark,1,NA,Check for NA if overnight ==1
 CampingOutPark,1,NA,Check for NA if overnight ==1
 LodgingInPark,1,NA,Check for NA if overnight ==1
 LodgingOutPark,1,NA,Check for NA if overnight ==1
 Cruise,,,
 OtherAccomdations,,,
-HoursinPark,1,NA,
+HoursinPark,1,NA,if DaysinPark > 0  than HoursinPark == NA
 DaysinPark,1, DaysinPark > 14,
 package,,,
 daysPackage,,,
@@ -28,14 +28,14 @@ gearPackage,,,
 admissionPackage,,,
 otherPackage,,,
 Entrance999,,,
-Gas,1,NA,Check for NA (i.e. blank)
+GasCleaned,1,NA,Check for NA (i.e. blank)
 RentalCar,1,NA,Check for NA (i.e. blank)
-PublicTransportation,1,NA,Check for NA (i.e. blank)
+PubTrans,1,NA,Check for NA (i.e. blank)
 Restaurants,1,NA,Check for NA (i.e. blank)
 Snacks,1,NA,Check for NA (i.e. blank)
 Groceries,1,NA,Check for NA (i.e. blank)
 Hotels,1,NA,Check for NA (i.e. blank)
-EquipmentRental,1,NA,Check for NA (i.e. blank)
+EquipRental,1,NA,Check for NA (i.e. blank)
 SpecialtyLodge999,1,NA,Check for NA (i.e. blank)
 Camping,1,NA,Check for NA (i.e. blank)
 Recreation,1,NA,Check for NA (i.e. blank)
@@ -46,5 +46,5 @@ Tours,1,NA,Check for NA (i.e. blank)
 OtherExpen,1,NA,Check for NA (i.e. blank)
 AdditionalExpen999,,,
 TotalExpenditures,,,
-AdultsCovered,1,AdultsCovered <= NumAdults,Do we want to check this?
+AdultsCovered,1,AdultsCovered <= NumAdults,Secondary check for consistancy - don’t weight AdultsGroup too heavily
 ChildrenCovered,1,ChildrenCovered <= NumChild,
