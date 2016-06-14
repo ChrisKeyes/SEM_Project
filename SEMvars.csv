@@ -59,3 +59,5 @@ AdultsCovered,AdultsCovered,Q34a_AdultsCovered
 ChildrenCovered,ChildrenCovered,Q34b_ChildrenCovered
 numSplit,SplitExpenses,Q34c_SplitExpenses
 zip,a_Zip,Q36a_Zip
+expTotal,TotExpen,Q33_TotExpen
+expOtherCoded,ExpenSpecifyCoded,Q33ma_OtherExpenSpecifyCoded
