@@ -1,8 +1,8 @@
 SEMvars,NumberChecks,Check,Note
 LiveNearby,1,NA,Check for NA (i.e. blank)
 a_Zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
-ReEnter,2,"NA,  ReEnter == 0",
-DKReEnter,,,REFER TO PRACTICE SCRIPT FOR RELATIONSHIP TO REENTER
+a_ReEnter,2,"NA,  ReEnter == 0",
+DKReEnter,1,99,DKReEnter == 99 & a_ReEnter = NA
 Overnight,1,NA,Check for NA (i.e. blank)
 CampingBackcountry,1,NA,Check for NA if overnight ==1; AT LEAST ONE CAT SHOULD BE >= 1 (NOT ALL ZEROS)
 CampingInPark,1,NA,Check for NA if overnight ==1
@@ -11,8 +11,8 @@ LodgingInPark,1,NA,Check for NA if overnight ==1
 LodgingOutPark,1,NA,Check for NA if overnight ==1
 Cruise,,,
 OtherAccomdations,,,
-HoursinPark,1,NA,if DaysinPark > 0  than HoursinPark == NA
-DaysinPark,1, DaysinPark > 14,
+HoursinPark,1,NA,"DaysinPark == NA & HoursinPark == NA,"
+DaysinPark,1,DaysinPark > 14,
 package,,,
 daysPackage,,,
 costPackage,,,

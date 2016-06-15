@@ -56,10 +56,6 @@ for (y in 1:length(CHECKvars$SEMvars)){
 
 # Each column of Bads (except "ID") is a check
 
-# HoursinPark; check for NA
-check <- PARKsem[is.na(PARKsem$HoursinPark),"ID"]
-    Bads$HoursinPark_1[c(check)] <- 1
-
 # LiveNearby; check for NA
 check <- PARKsem[is.na(PARKsem$LiveNearby),"ID"]
     Bads$LiveNearby_1[c(check)] <- 1
@@ -69,9 +65,6 @@ check <- PARKsem[is.na(PARKsem$Overnight),"ID"]
     Bads$Overnight_1[c(check)] <- 1
     
 
-# DaysinPark_1; check for DaysinPark > 14   (Outlier test)
-    ### STILL NEED TO SORT THIS OUT
- 
 #***************************************************************************************************
 # a_Zip:Factor variable with 306 levels
 # The as.numeric function forces the factors into numbers with range 1:number of levels
@@ -144,7 +137,6 @@ for (y in ExpVars){
 #***************************************************************************************************
 # Check for NA's in Segment categories:
 # Overnight_1: Check for NA
-# ReEnter_1: check for NA
 # CampingBackcountry_1: Check for NA
 # CampinginPark_1; Check for NA
 # CampingOutPark_1: Check for NA
@@ -152,7 +144,7 @@ for (y in ExpVars){
 # LodgingOutPark_1: Check for NA
 # HoursinPark_1: Check for NA
 
-SegmentVars <- c("Overnight", "ReEnter", "CampingBackcountry", "CampingInPark",
+SegmentVars <- c("Overnight", "CampingBackcountry", "CampingInPark",
                  "CampingOutPark", "LodgingInPark", "LodgingOutPark", "HoursinPark")    
 
 for (y in SegmentVars){
@@ -167,18 +159,45 @@ for (y in SegmentVars){
 
 
 #***************************************************************************************************
+# a_ReEnter_1: check for a_ReEnter == NA & DKReEnter == NA
+# These respondents refused to answer the question
+check <- PARKsem[is.na(PARKsem$a_ReEnter) &
+                   is.na(PARKsem$DKReEnter) ,"ID"]    
 
-# ReEnter_2: check for ReEnter == 0
+Bads$a_ReEnter_1[c(check)] <- 1
+
+
+# a_ReEnter_2: check for ReEnter >= 1 and DKReEnter == 99
+# These respondents provided an estimate of entries, but also noted that they "did not know"
+check <- PARKsem[as.numeric(PARKsem$a_ReEnter)>=1 &
+                   as.integer(PARKsem$DKReEnter)==99 ,"ID"]
+check <- na.omit(check)
+Bads$a_ReEnter_2[c(check)] <- 1
+
 
 # DKReEnter_1: 
+check <- PARKsem[is.na(PARKsem$a_ReEnter) &
+                   as.integer(PARKsem$DKReEnter)==99 ,"ID"]    
+check <- na.omit(check)
 
+Bads$DKReEnter_1[c(check)] <- 1
 
+# HoursinPark; check for NA
+check <- PARKsem[is.na(PARKsem$HoursinPark) &
+                   is.na(PARKsem$DaysinPark) ,"ID"]    
+Bads$HoursinPark_1[c(check)] <- 1
 
 
 # DaysinPark_1: Check for outliers (DaysinPark > 14)
+check <- PARKsem[as.numeric(PARKsem$DaysinPark)> 14,"ID"]    
+check <- na.omit(check)
+
+Bads$DaysinPark_1[c(check)] <- 1
 
 
-
+#***************************************************************************************************
+# Append column for summation of checks for each ID
+Bads$Sum <- rowsum(Bads[which(colnames(Bads) != c("ID"))], "ID")
       
     
     
