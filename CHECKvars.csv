@@ -1,18 +1,18 @@
 SEMvars,NumberChecks,Check,Note
-LiveNearby,1,NA,Check for NA (i.e. blank)
-a_Zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
-a_ReEnter,2,"NA,  ReEnter == 0",
-DKReEnter,1,99,DKReEnter == 99 & a_ReEnter = NA
-Overnight,1,NA,Check for NA (i.e. blank)
-CampingBackcountry,1,NA,Check for NA if overnight ==1; AT LEAST ONE CAT SHOULD BE >= 1 (NOT ALL ZEROS)
-CampingInPark,1,NA,Check for NA if overnight ==1
-CampingOutPark,1,NA,Check for NA if overnight ==1
-LodgingInPark,1,NA,Check for NA if overnight ==1
-LodgingOutPark,1,NA,Check for NA if overnight ==1
-Cruise,,,
-OtherAccomdations,,,
-HoursinPark,1,NA,"DaysinPark == NA & HoursinPark == NA,"
-DaysinPark,1,DaysinPark > 14,
+local,1,NA,Check for NA (i.e. blank)
+zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
+entries,2,"NA,  ReEnter == 0",
+DKentries,1,99,DKReEnter == 99 & a_ReEnter = NA
+overnight,1,NA,Check for NA (i.e. blank)
+nightsBackcountry,1,NA,Check for NA if overnight ==1; AT LEAST ONE CAT SHOULD BE >= 1 (NOT ALL ZEROS)
+nightsCampIn,1,NA,Check for NA if overnight ==1
+nightsCampOut,1,NA,Check for NA if overnight ==1
+nightsLodgeIn,1,NA,Check for NA if overnight ==1
+nightsLodgeOut,1,NA,Check for NA if overnight ==1
+nightsCruise,,,
+nightsOther,,,
+hoursPark,1,NA,"DaysinPark == NA & HoursinPark == NA,"
+daysPark,1,DaysinPark > 14,
 package,,,
 daysPackage,,,
 costPackage,,,
@@ -27,24 +27,25 @@ feesPackage,,,
 gearPackage,,,
 admissionPackage,,,
 otherPackage,,,
-Entrance999,,,
-GasCleaned,1,NA,Check for NA (i.e. blank)
-RentalCar,1,NA,Check for NA (i.e. blank)
-PubTrans,1,NA,Check for NA (i.e. blank)
-Restaurants,1,NA,Check for NA (i.e. blank)
-Snacks,1,NA,Check for NA (i.e. blank)
-Groceries,1,NA,Check for NA (i.e. blank)
-Hotels,1,NA,Check for NA (i.e. blank)
-EquipRental,1,NA,Check for NA (i.e. blank)
-SpecialtyLodge999,1,NA,Check for NA (i.e. blank)
-Camping,1,NA,Check for NA (i.e. blank)
-Recreation,1,NA,Check for NA (i.e. blank)
-Souvenirs,1,NA,Check for NA (i.e. blank)
-Guide999,1,NA,Check for NA (i.e. blank)
-Railroad,1,NA,Check for NA (i.e. blank)
-Tours,1,NA,Check for NA (i.e. blank)
-OtherExpen,1,NA,Check for NA (i.e. blank)
-AdditionalExpen999,,,
+expParkEntrance,,,
+expGas,1,NA,Check for NA (i.e. blank)
+expRentalCar,1,NA,Check for NA (i.e. blank)
+expPubTrans,1,NA,Check for NA (i.e. blank)
+expRestaurants,1,NA,Check for NA (i.e. blank)
+expSnacks,1,NA,Check for NA (i.e. blank)
+expGroceries,1,NA,Check for NA (i.e. blank)
+expHotels,1,NA,Check for NA (i.e. blank)
+expEqpRental,1,NA,Check for NA (i.e. blank)
+expSpecLodge,1,NA,Check for NA (i.e. blank)
+expcamp,1,NA,Check for NA (i.e. blank)
+expRec,1,NA,Check for NA (i.e. blank)
+expSouvenirs,1,NA,Check for NA (i.e. blank)
+expGuides,1,NA,Check for NA (i.e. blank)
+expRail,1,NA,Check for NA (i.e. blank)
+expTours,1,NA,Check for NA (i.e. blank)
+expOther,1,NA,Check for NA (i.e. blank)
+expAdditional,,,
 TotalExpenditures,,,
 AdultsCovered,1,AdultsCovered <= NumAdults,Secondary check for consistancy - don’t weight AdultsGroup too heavily
 ChildrenCovered,1,ChildrenCovered <= NumChild,
+expOtherCoded,,,
