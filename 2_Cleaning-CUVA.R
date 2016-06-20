@@ -32,6 +32,7 @@ for (v in PARKvars){
 # Drop the variables from CHECKvars that do not match those in PARKsem
 CHECKvars <- data.frame(CHECKvars[Matches,])
 
+
 # Create Data frame for taxonomy of bads.
 # First, create a data frame named Bads using the "ID" variable from PARKsem
 Bads <- data.frame(PARKsem[,c("ID")])
@@ -39,14 +40,13 @@ Bads <- data.frame(PARKsem[,c("ID")])
   
 # Using the matched variables in CHECKvar, create a column for each number of checks listed under
 # "NumberChecks".  The name of the column is SEMvar_#
-# CHECKS <- NULL  
+
 for (y in 1:length(CHECKvars$SEMvars)){
   z <- CHECKvars[c(y),c("NumberChecks")]
   if (is.na(z) == "TRUE"){
     #do nothing, there is no check on this variable
   }
   else { #the number of checks will be the number of columns added
-    #CHECKS <- append(CHECKS, CHECKvars$SEMvars[y]) 
     for (n in 1:z){
       ck = paste( CHECKvars$SEMvars[y] , n, sep = "_") 
       Bads[, ck] <- 0
@@ -60,7 +60,7 @@ for (y in 1:length(CHECKvars$SEMvars)){
 # PERFORM CHECKS ON SEM VARIABLES
 ################## Location variable checks ########################################################
 
-# LiveNearby; check for NA
+# Local_1; check for NA
 check <- PARKsem[is.na(PARKsem$local),"ID"]
     Bads$local_1[c(check)] <- 1
 
@@ -89,9 +89,24 @@ check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
 
       Bads$zip_2[c(check)] <- 1
 
-# zip_3: Identify incomplete zip codes    ******NOT WORKING
-    # check <- PARKsem[length(PARKsem$zip) < 5, "ID"]
-    #       Bads$zip_3[c(check)] <- 1
+# zip_3: Identify incomplete zip codes  #####still working on this
+# IncompleteZip <- NULL      
+# for (z in PARKsem$zip){
+#   
+#   if (PARKsem[is.na(as.numeric(PARKsem$zip[z])) == TRUE]){
+#     #do nothing
+#   }
+#   else if (PARKsem[as.numeric(PARKsem$zip) > 9999 &
+#                    as.numeric(PARKsem$zip) < 100000]){
+#     #do nothing
+#   }
+#   else {
+#     check <- PARKsem[as.numeric(PARKsem$zip)<=9999 |
+#                        as.numeric(PARKsem$zip)>99999, "ID"]  
+#     Bads$zip_3[c(check)] <- 1
+#     
+#   }
+# }    
 
 #***************************************************************************************************
 ####################### Check for NA's in expenditure categories ###################################
@@ -124,7 +139,7 @@ ExpVars <- c("expGas", "expRentalCar","expPubTrans", "expRestaurants", "expSnack
 # Save the ID which corresponds to the NA and for that ID number, save a "1" in the Bads data frame
 # under the column named "ExpVars_1" (where ExpVars is the current variable name in the loop)
 for (y in ExpVars){
-  if (exists(y, where = PARKsem) == TRUE){
+  if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
     
     check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
     
@@ -132,7 +147,27 @@ for (y in ExpVars){
     Bads[c(check), c(v)] <- 1
   }
 }
+      
+#***************************************************************************************************
+####################### Check for group type and expenditures vars #################################
+# adultsCovered
+# childrenCovered
+      
+# Create vector of group type variables
+GroupVars <- c("adultsCovered", "childrenCovered")
 
+# Loop over elements of GroupVars and if they are present in PARKsem, check for blank observations     
+for (y in GroupVars){
+  if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
+        
+    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
+        check <- na.omit(check)
+      
+    v = paste(y , "1", sep = "_")
+    Bads[c(check), c(v)] <- 1
+  }
+}
+      
 #***************************************************************************************************
 ####################### Check for NA's in Segment categories #######################################
 # Overnight_1: Check for NA
@@ -147,10 +182,10 @@ SegmentVars <- c("overnight", "nightsBackcountry", "nightsCampin", "nightsCampOu
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
 for (y in SegmentVars){
-  if (exists(y, where = PARKsem) == TRUE){
+  if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
     
     check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
-    
+
     v = paste(y , "1", sep = "_")
     Bads[c(check), c(v)] <- 1
   }
@@ -194,14 +229,11 @@ Bads$hoursPark_1[c(check)] <- 1
 
 
 # daysPark_1: Check for outliers (daysPark > 14)
+# NOTE: this was specific to CUVA, what sort of check should be use among all parks?
 check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
     check <- na.omit(check)
 
 Bads$daysPark_1[c(check)] <- 1
-
-# overnight_1; check for NA
-check <- PARKsem[is.na(PARKsem$overnight),"ID"]
-Bads$overnight_1[c(check)] <- 1
 
 
 #***************************************************************************************************

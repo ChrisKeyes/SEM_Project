@@ -46,6 +46,6 @@ expTours,1,NA,Check for NA (i.e. blank)
 expOther,1,NA,Check for NA (i.e. blank)
 expAdditional,,,
 TotalExpenditures,,,
-AdultsCovered,1,AdultsCovered <= NumAdults,Secondary check for consistancy - don’t weight AdultsGroup too heavily
-ChildrenCovered,1,ChildrenCovered <= NumChild,
+adultsCovered,1,AdultsCovered <= NumAdults,Secondary check for consistancy - don’t weight AdultsGroup too heavily
+childrenCovered,1,ChildrenCovered <= NumChild,
 expOtherCoded,,,
