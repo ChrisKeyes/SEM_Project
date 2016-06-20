@@ -6,7 +6,6 @@ setwd("~/SEM_Project")
 # source("1_Load&Subset-CUVA.R")
 source("1_Load&Subset-FIXED.R")
 
-
 # Clear the environment except for the data we want
 rm(list=setdiff(ls(), c("CUVAsem","PARKsem")))  # NOTE: once script is finalized, delete this line 
 
@@ -28,19 +27,18 @@ for (v in PARKvars){
   MM <-   grep( v, CHECKvars$SEMvars, ignore.case = TRUE, value = FALSE)
   Matches <- append(Matches, MM)
 }
+  rm(MM, v) #Remove extraneous variables
 
 # Drop the variables from CHECKvars that do not match those in PARKsem
 CHECKvars <- data.frame(CHECKvars[Matches,])
 
-
-# Create Data frame for taxonomy of bads.
+# Create Data frame for matrix of bads.
 # First, create a data frame named Bads using the "ID" variable from PARKsem
 Bads <- data.frame(PARKsem[,c("ID")])
   colnames(Bads) <- c("ID")
   
 # Using the matched variables in CHECKvar, create a column for each number of checks listed under
 # "NumberChecks".  The name of the column is SEMvar_#
-
 for (y in 1:length(CHECKvars$SEMvars)){
   z <- CHECKvars[c(y),c("NumberChecks")]
   if (is.na(z) == "TRUE"){
@@ -53,19 +51,20 @@ for (y in 1:length(CHECKvars$SEMvars)){
     }
   }
 }
+    rm(n,y,z,ck) #Remove extraneous variables
 
 # Each column of Bads is a check to be performed on that variable, and specific to each "ID"
 
 ####################################################################################################
 # PERFORM CHECKS ON SEM VARIABLES
 ################## Location variable checks ########################################################
-
+# Local:
 # Local_1; check for NA
 check <- PARKsem[is.na(PARKsem$local),"ID"]
     Bads$local_1[c(check)] <- 1
 
-
-# zip:Factor variable with 306 levels
+# zip:
+# Factor variable with 306 levels
 # The "as.numeric" function forces the factors into numbers with range 1:number of levels
 # For zip, as.numeric identifies each a_Zip as a number 1:306; "levels()" lists levels
 levels(PARKsem$zip)   
@@ -129,13 +128,15 @@ check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
 #     AdditionalExpen
 
 # Create vector of expenditure variable names
+      # NOTE: The vector below is CASE SENSITIVE
 ExpVars <- c("expGas", "expRentalCar","expPubTrans", "expRestaurants", "expSnacks", 
              "expGroceries", "expHotels", "expEqpRental", "expSpecLodge", "expcamp", "expRec", 
              "expSouvenirs", "expGuides", "expRail", "expTours", "expOther",
              "expAdditional")
 
 # Loop through the variables in ExpVars
-# If the given expenditure variable exists within PARKsem then check for NA's within that column
+# If the given expenditure variable exists within PARKsem, and has a check to be performed
+# check for NA's within that column.
 # Save the ID which corresponds to the NA and for that ID number, save a "1" in the Bads data frame
 # under the column named "ExpVars_1" (where ExpVars is the current variable name in the loop)
 for (y in ExpVars){
@@ -150,13 +151,14 @@ for (y in ExpVars){
       
 #***************************************************************************************************
 ####################### Check for group type and expenditures vars #################################
-# adultsCovered
-# childrenCovered
+#     adultsCovered
+#     childrenCovered
       
 # Create vector of group type variables
+      # NOTE: The vector below is CASE SENSITIVE
 GroupVars <- c("adultsCovered", "childrenCovered")
 
-# Loop over elements of GroupVars and if they are present in PARKsem, check for blank observations     
+# Loop over elements of GroupVars and if they are present in PARKsem check for NULL observations     
 for (y in GroupVars){
   if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
         
@@ -170,17 +172,20 @@ for (y in GroupVars){
       
 #***************************************************************************************************
 ####################### Check for NA's in Segment categories #######################################
-# Overnight_1: Check for NA
-# CampingBackcountry_1: Check for NA
-# CampinginPark_1; Check for NA
-# CampingOutPark_1: Check for NA
-# LodgingInPark_1: Check for NA
-# LodgingOutPark_1: Check for NA
-# HoursinPark_1: Check for NA
+#     Overnight
+#     CampingBackcountry
+#     CampinginPark
+#     CampingOutPark
+#     LodgingInPark
+#     LodgingOutPark
+#     HoursinPark
 
+# Create vector of segment category variables
+    # NOTE: The vector below is CASE SENSITIVE
 SegmentVars <- c("overnight", "nightsBackcountry", "nightsCampin", "nightsCampOut",
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
+# Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations     
 for (y in SegmentVars){
   if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
     
@@ -191,7 +196,6 @@ for (y in SegmentVars){
   }
 }
 
-# *** nightsOther not working -- need to fix ***
       
 #***************************************************************************************************
 ###################### Check the ReEnter question ##################################################
@@ -247,10 +251,10 @@ check <- Bads[is.na(Bads$Sum) ,"ID"]
 # Store Bads data frame as PARKbads
 PARKbads <- Bads 
 
-CUVAbads <- PARKbads
+CUVAbads <- PARKbads  #NOTE: modify this line for park of interest
 
 # Remove Bads dataframe
-rm(Bads)
+rm(Bads, v, y, check)
   
   
 
