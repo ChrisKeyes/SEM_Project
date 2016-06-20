@@ -19,7 +19,7 @@ CHECKvars <- read.csv("~/SEM_Project/CHECKVars.csv")
 
 # Drop SEMvars which PARKsem does not contain. First create a vector of the variable names which
 # the park has (do not include "ID")
-PARKvars <- colnames(PARKsem[which(colnames(PARKsem) != c("groupID"))])
+PARKvars <- colnames(PARKsem[which(colnames(PARKsem) != c("ID"))])
 
 # Comparing the PARKvars to the SEMvars within CHECKvars, find those that match and store the 
 # number of checks that correspond to those variables
@@ -34,8 +34,8 @@ CHECKvars <- data.frame(CHECKvars[Matches,])
 
 # Create Data frame for taxonomy of bads.
 # First, create a data frame named Bads using the "ID" variable from PARKsem
-Bads <- data.frame(PARKsem[,c("groupID")])
-  colnames(Bads) <- c("groupID")
+Bads <- data.frame(PARKsem[,c("ID")])
+  colnames(Bads) <- c("ID")
   
 # Using the matched variables in CHECKvar, create a column for each number of checks listed under
 # "NumberChecks".  The name of the column is SEMvar_#
@@ -61,7 +61,7 @@ for (y in 1:length(CHECKvars$SEMvars)){
 ################## Location variable checks ########################################################
 
 # LiveNearby; check for NA
-check <- PARKsem[is.na(PARKsem$local),"groupID"]
+check <- PARKsem[is.na(PARKsem$local),"ID"]
     Bads$local_1[c(check)] <- 1
 
 
@@ -75,7 +75,7 @@ levels(PARKsem$zip)
         # 301:306 = All countries and non-zip codes
         
 # zip_1; Identify NULL (blank zip codes)      ****NOTE: CUVA DID NOT HAVE "NA" FOR NULL, BUT ACTUAL " " (BLANKS)
-check <- PARKsem[as.numeric(PARKsem$zip) == 1 ,"groupID"]
+check <- PARKsem[as.numeric(PARKsem$zip) == 1 ,"ID"]
       Bads$zip_1[c(check)] <- 1
         
         
@@ -85,7 +85,7 @@ check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
                    as.numeric(PARKsem$zip) == 303 |
                    as.numeric(PARKsem$zip) == 304 |
                    as.numeric(PARKsem$zip) == 305 |
-                   as.numeric(PARKsem$zip) == 306 ,"groupID"]    # "|" is the "or" syntax
+                   as.numeric(PARKsem$zip) == 306 ,"ID"]    # "|" is the "or" syntax
 
       Bads$zip_2[c(check)] <- 1
 
@@ -126,7 +126,7 @@ ExpVars <- c("expGas", "expRentalCar","expPubTrans", "expRestaurants", "expSnack
 for (y in ExpVars){
   if (exists(y, where = PARKsem) == TRUE){
     
-    check <- PARKsem[is.na(PARKsem[c(y)]),"groupID"]
+    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
     
     v = paste(y , "1", sep = "_")
     Bads[c(check), c(v)] <- 1
@@ -149,7 +149,7 @@ SegmentVars <- c("overnight", "nightsBackcountry", "nightsCampin", "nightsCampOu
 for (y in SegmentVars){
   if (exists(y, where = PARKsem) == TRUE){
     
-    check <- PARKsem[is.na(PARKsem[c(y)]),"groupID"]
+    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
     
     v = paste(y , "1", sep = "_")
     Bads[c(check), c(v)] <- 1
@@ -163,7 +163,7 @@ for (y in SegmentVars){
 # entries_1: check for entries == NA & DKentries == NA
 # These respondents refused to answer the question
 check <- PARKsem[is.na(PARKsem$entries) &
-                   is.na(PARKsem$DKentries) ,"groupID"]    
+                   is.na(PARKsem$DKentries) ,"ID"]    
 
 Bads$entries_1[c(check)] <- 1
 
@@ -171,7 +171,7 @@ Bads$entries_1[c(check)] <- 1
 # entries_2: check for ReEnter >= 1 and DKReEnter == 99
 # These respondents provided an estimate of entries, but also noted that they "did not know"
 check <- PARKsem[as.numeric(PARKsem$entries)>=1 &
-                   as.integer(PARKsem$DKentries)==99 ,"groupID"]
+                   as.integer(PARKsem$DKentries)==99 ,"ID"]
     check <- na.omit(check)
 
 Bads$entries_2[c(check)] <- 1
@@ -179,7 +179,7 @@ Bads$entries_2[c(check)] <- 1
 
 # DKentries_1: check if respondent only answered "Dont Know"
 check <- PARKsem[is.na(PARKsem$entries) &
-                   as.integer(PARKsem$DKentries)==99 ,"groupID"]    
+                   as.integer(PARKsem$DKentries)==99 ,"ID"]    
     check <- na.omit(check)
 
 Bads$DKentries_1[c(check)] <- 1
@@ -189,27 +189,27 @@ Bads$DKentries_1[c(check)] <- 1
 ##################### Other checks #################################################################
 # hoursPark_1; check for NA
 check <- PARKsem[is.na(PARKsem$hoursPark) &
-                   is.na(PARKsem$daysPark) ,"groupID"]    
+                   is.na(PARKsem$daysPark) ,"ID"]    
 Bads$hoursPark_1[c(check)] <- 1
 
 
 # daysPark_1: Check for outliers (daysPark > 14)
-check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"groupID"]    
+check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
     check <- na.omit(check)
 
 Bads$daysPark_1[c(check)] <- 1
 
 # overnight_1; check for NA
-check <- PARKsem[is.na(PARKsem$overnight),"groupID"]
+check <- PARKsem[is.na(PARKsem$overnight),"ID"]
 Bads$overnight_1[c(check)] <- 1
 
 
 #***************************************************************************************************
 # Append column for summation of checks for each ID
 Bads$Sum <- 0
-Bads$Sum <- rowSums(Bads[,c(which(colnames(Bads) != c("groupID")))])    
+Bads$Sum <- rowSums(Bads[,c(which(colnames(Bads) != c("ID")))])    
 
-check <- Bads[is.na(Bads$Sum) ,"groupID"]    
+check <- Bads[is.na(Bads$Sum) ,"ID"]    
     Bads$Sum[c(check)] <- as.numeric(0)
 
 # Store Bads data frame as PARKbads
