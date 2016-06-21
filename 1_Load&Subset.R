@@ -82,6 +82,7 @@ CUVAsem <- PARKsem
   
   
 # End of script - Move to cleaning script
+setwd("~/SEM_Project")
 
 
 ################################################################################################

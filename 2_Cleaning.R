@@ -4,10 +4,10 @@
 setwd("~/SEM_Project")
 
 # source("1_Load&Subset-CUVA.R")
-source("1_Load&Subset-FIXED.R")
+source("1_Load&Subset.R")
 
 # Clear the environment except for the data we want
-rm(list=setdiff(ls(), c("CUVAsem","PARKsem")))  # NOTE: once script is finalized, delete this line 
+rm(list=setdiff(ls(), c("CUVAsem","ACADsem", "YOSEsem", "PARKsem")))  # NOTE: once script is finalized, delete this line 
 
 # Will use "PARKsem" as general name for the dataset
 PARKsem <- CUVAsem
