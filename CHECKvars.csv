@@ -3,7 +3,7 @@ local,1,NA,Check for NA (i.e. blank)
 zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
 entries,2,"NA,  ReEnter == 0",
 DKentries,1,99,DKReEnter == 99 & a_ReEnter = NA
-overnight,1,NA,Check for NA (i.e. blank)
+overnight,1,NA,Check for NA; overnight_1 ==1 {see hoursPark_1 & daysPark_1 to fill in missing data}
 nightsBackcountry,1,NA,Check for NA if overnight ==1; AT LEAST ONE CAT SHOULD BE >= 1 (NOT ALL ZEROS)
 nightsCampIn,1,NA,Check for NA if overnight ==1
 nightsCampOut,1,NA,Check for NA if overnight ==1
@@ -11,8 +11,8 @@ nightsLodgeIn,1,NA,Check for NA if overnight ==1
 nightsLodgeOut,1,NA,Check for NA if overnight ==1
 nightsCruise,,,
 nightsOther,,,
-hoursPark,1,NA,"DaysinPark == NA & HoursinPark == NA,"
-daysPark,1,DaysinPark > 14,
+hoursPark,2,"NA, hoursPark>24","Check for NA, hoursPark_1 == 1 {hoursPark == NA & daysPark == NA & overnight == NA; assume day trip}"
+daysPark,2,"{daysPark ==NA & hoursPark == NA}, DaysinPark > 14",
 package,,,
 daysPackage,,,
 costPackage,,,

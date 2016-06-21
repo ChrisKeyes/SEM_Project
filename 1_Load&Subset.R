@@ -66,7 +66,7 @@ MATCHvars <- levels(SEMVars[,c(PARKname)])
       MATCHvars <- MATCHvars[which(MATCHvars!= c(""))]  # remove any NULL values
       
 # subset data on the selected variable names      
-PARKsem <- PARKdata[,c(MATCHvars)]  
+PARKsem <- PARKdata[c(MATCHvars)]  
   
 #Rename the variables to SEMvars for consistancy
 colIndex <- NULL

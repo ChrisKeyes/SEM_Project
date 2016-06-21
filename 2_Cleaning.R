@@ -172,7 +172,6 @@ for (y in GroupVars){
       
 #***************************************************************************************************
 ####################### Check for NA's in Segment categories #######################################
-#     Overnight
 #     CampingBackcountry
 #     CampinginPark
 #     CampingOutPark
@@ -182,7 +181,7 @@ for (y in GroupVars){
 
 # Create vector of segment category variables
     # NOTE: The vector below is CASE SENSITIVE
-SegmentVars <- c("overnight", "nightsBackcountry", "nightsCampin", "nightsCampOut",
+SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
 # Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations     
@@ -196,7 +195,49 @@ for (y in SegmentVars){
   }
 }
 
+# overnight:
+# Check to see if respondant refused to answer overnight (or if RSG did not fill in).  
+# If overnight is NULL, see hoursPark_1 and daysPark_1 to fill in incomplete data
+check <- PARKsem[is.na(PARKsem$overnight) ,"ID"]
+
+      Bads$overnight_1[c(check)] <- 1
       
+# hoursPark:
+# hoursPark_1:
+# Check for NULL observations in hoursPark, daysPark, and overnight. If all three variables are 
+# NULL, then must assume day trip (overnight == 0).
+check <- PARKsem[is.na(PARKsem$hoursPark) &
+                        is.na(PARKsem$daysPark) &
+                        is.na(PARKsem$overnight),"ID"]
+      
+      Bads$hoursPark_1[c(check)] <- 1
+      
+      # NOTE: hoursPark_1 == 1 implies daysPark == 1 in PARKsem
+      
+# hoursPark_2:
+# Check to see if respondant answered >24 hours
+check <- PARKsem[na.exclude(PARKsem$hoursPark > 24),"ID"]   #NOT PULLING CORRECT ID'S   
+
+Bads$hoursPark_2[c(check)] <- 1
+      
+      
+# daysPark:
+# daysPark_1:
+# Check for observations with daysPark == NA and hoursPark == NA
+# If both daysPark and hoursPark are blank, assume daysPark == 1 unless overnight suggests otherwise
+check <- PARKsem[is.na(PARKsem$daysPark) &
+                   is.na(PARKsem$hoursPark), "ID"]
+
+Bads$daysPark_1[c(check)] <- 1
+
+# daysPark_2: Check for outliers (daysPark > 14)
+# NOTE: this was specific to CUVA, what sort of check should be use among all parks?
+check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
+      check <- na.omit(check)
+      
+Bads$daysPark_2[c(check)] <- 1
+      
+
 #***************************************************************************************************
 ###################### Check the ReEnter question ##################################################
 # entries_1: check for entries == NA & DKentries == NA
@@ -226,18 +267,7 @@ Bads$DKentries_1[c(check)] <- 1
 
 #***************************************************************************************************
 ##################### Other checks #################################################################
-# hoursPark_1; check for NA
-check <- PARKsem[is.na(PARKsem$hoursPark) &
-                   is.na(PARKsem$daysPark) ,"ID"]    
-Bads$hoursPark_1[c(check)] <- 1
 
-
-# daysPark_1: Check for outliers (daysPark > 14)
-# NOTE: this was specific to CUVA, what sort of check should be use among all parks?
-check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
-    check <- na.omit(check)
-
-Bads$daysPark_1[c(check)] <- 1
 
 
 #***************************************************************************************************
