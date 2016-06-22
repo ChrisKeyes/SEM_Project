@@ -3,7 +3,6 @@
 # Use the script 1_Upload... to get the data
 setwd("~/SEM_Project")
 
-# source("1_Load&Subset-CUVA.R")
 source("1_Load&Subset.R")
 
 # Clear the environment except for the data we want
@@ -129,6 +128,8 @@ check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
 
 # Create vector of expenditure variable names
       # NOTE: The vector below is CASE SENSITIVE
+      # NOTE: need to add ALL possible exp* categories
+      
 ExpVars <- c("expGas", "expRentalCar","expPubTrans", "expRestaurants", "expSnacks", 
              "expGroceries", "expHotels", "expEqpRental", "expSpecLodge", "expcamp", "expRec", 
              "expSouvenirs", "expGuides", "expRail", "expTours", "expOther",
@@ -177,31 +178,68 @@ for (y in GroupVars){
 #     CampingOutPark
 #     LodgingInPark
 #     LodgingOutPark
-#     HoursinPark
 
 # Create vector of segment category variables
     # NOTE: The vector below is CASE SENSITIVE
+    # NOTE: add ALL possible segment categories
+      
 SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
-# Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations     
+# Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations when 
+# overnight == 1. This check will identify overnight segment variables which are incomplete, but can be 
+# filled in with zeros.
 for (y in SegmentVars){
   if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
     
-    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
-
+    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"] # grab "ID"'s where "nights*" == NA
+        
+        tempDF <- PARKsem[c(check),]  # create temporary dataframe which is subset of 
+                                      # PARKsem where "nights*" == NA
+            
+            check <- tempDF[na.omit(tempDF$overnight == 1) , "ID"]  # grab "ID"'s from temporary DF where 
+                                                                    # overnight == 1.  
+      
     v = paste(y , "1", sep = "_")
     Bads[c(check), c(v)] <- 1
   }
 }
 
 # overnight:
+# overnight_1: 
 # Check to see if respondant refused to answer overnight (or if RSG did not fill in).  
 # If overnight is NULL, see hoursPark_1 and daysPark_1 to fill in incomplete data
 check <- PARKsem[is.na(PARKsem$overnight) ,"ID"]
 
       Bads$overnight_1[c(check)] <- 1
-      
+
+# overnight_2:
+# Check to identify observations with overnight==NA, but either daysPark >=0 or
+# hoursPark >=0 or both
+check <- PARKsem[is.na(PARKsem$overnight) &
+                   (is.na(PARKsem$hoursPark)==FALSE |
+                      is.na(PARKsem$daysPark)==FALSE) , "ID"]
+
+      Bads$overnight_2[c(check)] <- 1
+
+# # overnight_3:
+# # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
+# SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
+#                        "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
+#       
+# # Loop over elements of SegmentVars and if they are present in PARKsem check for incomplete     
+#       for (y in SegmentVars){
+#         if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
+#           
+#           check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
+#           
+#           v = paste(y , "1", sep = "_")
+#           Bads[c(check), c(v)] <- 1
+#         }
+#       }
+#       
+# check <- PARKsem[na.omit(PARKsem$overnight) == 1 &
+                   ]
 # hoursPark:
 # hoursPark_1:
 # Check for NULL observations in hoursPark, daysPark, and overnight. If all three variables are 

@@ -35,6 +35,7 @@ DataNameVector <- c(NULL)  #to be used within the loop
 
 for (x in Parklist) {
     ParkName <- substr(x, 1, 4)
+        ParkName <- paste(ParkName, "data", sep = "")
     DataNameVector <- append(DataNameVector, ParkName)
     
         WD <- getwd()
@@ -58,7 +59,7 @@ SEMVars <- read.csv("~/SEM_Project/SEMvars.csv")
   
 ################################################################################################
 # Use the two lines below to specify which park to subset and rename columns
-PARKdata <- CUVA
+PARKdata <- CUVAdata
 PARKname <- "CUVA"
   
 # create vector of variable names which define which variable names to keep

@@ -13,21 +13,50 @@ PARKsem <- CUVAsem
 ###########################################################################################
 #***************** SEGMENT VARIABLE CREATION & ANALYSIS ***********************************
 
+# The park specific data frame will be called "PARKsegments" and will be used for 
+# segment analysis
 
-# For segment variables, drop observations which do not match rules:
-# rule_1: Must have answered local (from PARKbads, local_1 == 0)
-# rule_2: Must have answered overnight or daysPark (from PARKbads, overnight_1 == 0 & daysPark_1 == 0)
-# IDpassR1 <- PARKbads[PARKbads$local_1 == 0 , "ID"]  #rule 1
-#     PARKsegments <- PARKsem[c(IDpassR1),] 
-# 
-# IDpassR2 <- PARKbads[PARKbads$overnight_1 == 0 &
-#                      PARKbads$daysPark_1 == 0 , "ID"] #rule 2
-# 
-# PARKsegments <- PARKsegments[na.omit(match(IDpassR2, PARKsegments$ID)),]
+# Subset data by droping observations which do not match rules:
 
-# Try to drop observations, rather than keep
+# RULE_1: Must have answered local (from PARKbads, local_1 == 0)
+       
+      # NOTE: we could write additional check to fill in missing "local" values. 
+      # For example, if local == NA, but zip == "some country" then we can assign 
+      # observation to non-local category
+       
+# RULE_2: Must have answered overnight or have sufficient data to assign day or ON trip
+
+            # (e.g. within PARKbads, overnight_1 == 0 & daysPark_1 == 0)
+            # IDpassR1 <- PARKbads[PARKbads$local_1 == 0 , "ID"]  #rule 1
+            #     PARKsegments <- PARKsem[c(IDpassR1),] 
+            # 
+            # IDpassR2 <- PARKbads[PARKbads$overnight_1 == 0 &
+            #                      PARKbads$daysPark_1 == 0 , "ID"] #rule 2
+            # 
+            # PARKsegments <- PARKsegments[na.omit(match(IDpassR2, PARKsegments$ID)),]
+            
+            # Try to drop observations, rather than keep
+
+
+# Create PARKsegments data frame from PARKsem data 
+PARKsegments <- PARKsem
+
+# Rule 1: create a vector of "ID"'s which do not satisfy rule 1:
 r1Fail <- PARKbads[PARKbads$local_1 == 1 , "ID"]  #rule 1
-PARKsegments <- PARKsem[-c(r1Fail),] 
+
+# Rule 2: create a vector of "ID"'s which do not satisfy rule 2. 
+# First, use overnight_1 and hoursPark_1 to fill in incomplete observations:
+r2Check <- PARKbads[PARKbads$overnight_1 == 1 &
+                      PARKbads$hoursPark_1 == 1 , "ID"]
+
+# The vector r2Check is a list of "ID"'s which are incomplete but can be assigned
+# day trip category.  Change overnight == NA to overnight == 0
+PARKsegments$overnight[c(r2Check)] <- 1
+
+# Create a temporary dataframe to check 
+r2bads <- PARKbads[-c(r2Check),]
+# Drop the observations from PARKsegments using r1Fail vector:
+PARKsegments <- PARKsegments[-c(r1Fail),] 
 
 IDpassR2 <- PARKbads[PARKbads$overnight_1 == 1 &
                        PARKbads$daysPark_1 == 1 , "ID"] #rule 2
