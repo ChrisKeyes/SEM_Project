@@ -59,8 +59,8 @@ SEMVars <- read.csv("~/SEM_Project/SEMvars.csv")
   
 ################################################################################################
 # Use the two lines below to specify which park to subset and rename columns
-PARKdata <- CUVAdata
-PARKname <- "CUVA"
+PARKdata <-    CUVAdata #  TESTdata #
+PARKname <-  "CUVA"
   
 # create vector of variable names which define which variable names to keep
 MATCHvars <- levels(SEMVars[,c(PARKname)])
@@ -79,7 +79,7 @@ for (r in MATCHvars){
 colnames(PARKsem) <- SEMVars$SEMvars[c(colIndex)]
   
 # Use the line below to name the data frame to the specific park  
-CUVAsem <- PARKsem
+ CUVAsem <- PARKsem
   
   
 # End of script - Move to cleaning script

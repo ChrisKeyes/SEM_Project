@@ -11,6 +11,7 @@ rm(list=setdiff(ls(), c("CUVAsem","ACADsem", "YOSEsem", "PARKsem")))  # NOTE: on
 # Will use "PARKsem" as general name for the dataset
 PARKsem <- CUVAsem
 
+
 ###################################################################################################
 # Upload the CHECKvars csv and store as "CHECKvars"
 CHECKvars <- read.csv("~/SEM_Project/CHECKVars.csv")
@@ -183,28 +184,30 @@ for (y in GroupVars){
     # NOTE: The vector below is CASE SENSITIVE
     # NOTE: add ALL possible segment categories
       
-SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
+SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
 # Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations when 
 # overnight == 1. This check will identify overnight segment variables which are incomplete, but can be 
 # filled in with zeros.
-for (y in SegmentVars){
-  if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
-    
-    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"] # grab "ID"'s where "nights*" == NA
-        
-        tempDF <- PARKsem[c(check),]  # create temporary dataframe which is subset of 
-                                      # PARKsem where "nights*" == NA
-            
-            check <- tempDF[na.omit(tempDF$overnight == 1) , "ID"]  # grab "ID"'s from temporary DF where 
-                                                                    # overnight == 1.  
       
-    v = paste(y , "1", sep = "_")
+for (y in SegmentVars){
+  if (exists(y, where = PARKsem) == TRUE){
+
+    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"] # grab "ID"'s where "nights*" == NA
+
+        tempDF <- PARKsem[c(check),]  # create temporary dataframe which is subset of
+                                      # PARKsem where "nights*" == NA
+
+            check <- tempDF[na.omit(tempDF$overnight == 1) , "ID"]  # grab "ID"'s from temporary DF where
+                                                                    # overnight == 1.
+
+    v <- paste(y , "1", sep = "_")
     Bads[c(check), c(v)] <- 1
   }
 }
 
+      
 # overnight:
 # overnight_1: 
 # Check to see if respondant refused to answer overnight (or if RSG did not fill in).  
@@ -222,24 +225,24 @@ check <- PARKsem[is.na(PARKsem$overnight) &
 
       Bads$overnight_2[c(check)] <- 1
 
-# # overnight_3:
-# # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
-# SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
-#                        "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
-#       
-# # Loop over elements of SegmentVars and if they are present in PARKsem check for incomplete     
-#       for (y in SegmentVars){
-#         if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
-#           
-#           check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
-#           
-#           v = paste(y , "1", sep = "_")
-#           Bads[c(check), c(v)] <- 1
-#         }
-#       }
-#       
-# check <- PARKsem[na.omit(PARKsem$overnight) == 1 &
-                   ]
+# # # overnight_3:
+# # # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
+#  SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
+#                         "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
+#   
+
+# y <- NULL
+# for (x in SegmentVars){
+#   if (exists(x, where = PARKsem)){
+#     y <- append(y, x)
+#   }
+# }
+# tempDF <- PARKsem[,c("ID", "overnight", c(y))] 
+#     check <- tempDF[c(na.omit(tempDF$overnight == 1) == TRUE), "ID"]
+#       tempDF <- tempDF[check,]
+      
+     ########## finish overnight_3 
+      
 # hoursPark:
 # hoursPark_1:
 # Check for NULL observations in hoursPark, daysPark, and overnight. If all three variables are 
@@ -254,7 +257,7 @@ check <- PARKsem[is.na(PARKsem$hoursPark) &
       
 # hoursPark_2:
 # Check to see if respondant answered >24 hours
-check <- PARKsem[na.exclude(PARKsem$hoursPark > 24),"ID"]   #NOT PULLING CORRECT ID'S   
+check <- PARKsem[(na.exclude(PARKsem$hoursPark) > 24),"ID"]   #NOT PULLING CORRECT ID'S   
 
 Bads$hoursPark_2[c(check)] <- 1
       

@@ -51,14 +51,21 @@ r2Check <- PARKbads[PARKbads$overnight_1 == 1 &
 
 # The vector r2Check is a list of "ID"'s which are incomplete but can be assigned
 # day trip category.  Change overnight == NA to overnight == 0
-PARKsegments$overnight[c(r2Check)] <- 1
+PARKsegments$overnight[c(r2Check)] <- 0
 
-# Create a temporary dataframe to check 
-r2bads <- PARKbads[-c(r2Check),]
-# Drop the observations from PARKsegments using r1Fail vector:
-PARKsegments <- PARKsegments[-c(r1Fail),] 
+# Collect "ID"s which do not satisfy rule 2
+r2Fail <- PARKbads[PARKbads$overnight_1 == 1, "ID"]
 
-IDpassR2 <- PARKbads[PARKbads$overnight_1 == 1 &
-                       PARKbads$daysPark_1 == 1 , "ID"] #rule 2
+# Remove from r2Fail the ID's which have been corrected using r2Check
+r2Fail <- as.factor(setdiff(r2Fail, r2Check))
 
-PARKsegments <- PARKsegments[na.omit(match(IDpassR2, PARKsegments$ID)),]
+# Drop the observations from PARKsegments which fail Rule 1 and Rule 2:
+IDdrop <- as.factor(union(r1Fail, r2Fail))
+
+PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
+
+
+# CODE ABOVE WORKS - CREATE SHARES NEXT 
+
+
+
