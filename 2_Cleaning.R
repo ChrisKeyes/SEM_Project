@@ -241,7 +241,7 @@ check <- PARKsem[is.na(PARKsem$overnight) &
 #     check <- tempDF[c(na.omit(tempDF$overnight == 1) == TRUE), "ID"]
 #       tempDF <- tempDF[check,]
       
-     ########## finish overnight_3 
+      ############### finish overnight_3 ###############
       
 # hoursPark:
 # hoursPark_1:

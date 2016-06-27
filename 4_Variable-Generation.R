@@ -63,9 +63,48 @@ r2Fail <- as.factor(setdiff(r2Fail, r2Check))
 IDdrop <- as.factor(union(r1Fail, r2Fail))
 
 PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
+  head(PARKsegments)  #this is our subsetted data for analysis
+  
+# Begin finding shares:
+n <- length(PARKsegments$overnight)
+
+n_overnight <- sum((PARKsegments[,"overnight"]==1)) 
+      # NOTE:  if you recieve "NA" rather than a number, the data is not suffieciently cleaned
+n_day <- sum((PARKsegments[,"overnight"] == 0))
+
+    ON_share <- n_overnight/n
+    
+# check for consistancy
+  n_overnight == (n - n_day)   # "TRUE" is good
+  
+
+# Add columns to PARKsegments to classify each observation
+# Each column is initially a vector of zeros
+PARKsegments$day_local <- 0
+
+nonlocal_Segments <- c("day", "CampIn", "CampOut" , "LodgeIn", "LodgeOut", "Other")
+
+Segments_colnames <- paste("nights", c("CampIn", "CampOut" , "LodgeIn", "LodgeOut", "Other"), sep = "")
+
+for (y in nonLocal_Segments){
+  v = paste(y , "nonlocal", sep = "_")
+   
+  PARKsegments[,v] <- 0
+}
 
 
-# CODE ABOVE WORKS - CREATE SHARES NEXT 
+PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
+                         as.numeric(PARKsegments$overnight)==0 ] <- 1
 
+PARKsegments$day_nonlocal[as.integer(PARKsegments$local)==0 &
+                         as.numeric(PARKsegments$overnight)==0 ] <- 1
+
+### try using "aggregate" function ####
+### http://stackoverflow.com/questions/25314336/how-to-extract-the-maximum-value-within-each-group-in-a-data-frame
+for (x in PARKsegments[,"overnight"]){
+  if (as.numeric(x) == 1){
+     max(as.integer(PARKsegments[x, c(Segments_colnames)]) >=1 )
+}
+}
 
 
