@@ -6,11 +6,15 @@ setwd("~/SEM_Project")
 source("1_Load&Subset.R")
 
 # Clear the environment except for the data we want
-rm(list=setdiff(ls(), c("CUVAsem","ACADsem", "YOSEsem", "PARKsem")))  # NOTE: once script is finalized, delete this line 
+      # NOTE: we could make a vector of park names to clean up the list below (colnames in SEMvars would work)
+rm(list=setdiff(ls(), c("CUVAsem","ACADsem", "YOSEsem", "PARKsem", "TESTdata")))  # NOTE: once script is finalized, delete this line 
 
 # Will use "PARKsem" as general name for the dataset
-PARKsem <- CUVAsem
 
+PARKsem <- TESTdata    #Use this line to work with "TESTdata" and block out the line below
+# PARKsem <- CUVAsem
+
+# NOTE: "TESTdata" is already cleaned and renamed (e.g. subsetted version of PARKsem dataset)
 
 ###################################################################################################
 # Upload the CHECKvars csv and store as "CHECKvars"
@@ -34,9 +38,11 @@ CHECKvars <- data.frame(CHECKvars[Matches,])
 
 # Create Data frame for matrix of bads.
 # First, create a data frame named Bads using the "ID" variable from PARKsem
-Bads <- data.frame(PARKsem[,c("ID")])
-  colnames(Bads) <- c("ID")
-  
+
+Bads <- data.frame(PARKsem$ID, row.names = NULL)
+  colnames(Bads) <- "ID"
+  Bads$ID <- sort(Bads$ID, decreasing = FALSE)
+
 # Using the matched variables in CHECKvar, create a column for each number of checks listed under
 # "NumberChecks".  The name of the column is SEMvar_#
 for (y in 1:length(CHECKvars$SEMvars)){
@@ -68,7 +74,7 @@ check <- PARKsem[is.na(PARKsem$local),"ID"]
 # The "as.numeric" function forces the factors into numbers with range 1:number of levels
 # For zip, as.numeric identifies each a_Zip as a number 1:306; "levels()" lists levels
 levels(PARKsem$zip)   
-        
+
 # Examining levels we have:
         # 1 = " " (Null or blank entries)
         # 301:306 = All countries and non-zip codes
@@ -191,23 +197,19 @@ SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
 # overnight == 1. This check will identify overnight segment variables which are incomplete, but can be 
 # filled in with zeros.
       
-for (y in SegmentVars){
-  if (exists(y, where = PARKsem) == TRUE){
 
-    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"] # grab "ID"'s where "nights*" == NA
+      for (y in SegmentVars){
+        if (exists(y, where = PARKsem) == TRUE){
+          
+          check <- na.omit(PARKsem[with(PARKsem, overnight == 1 & is.na(PARKsem[y])), "ID"])
+             
+              v <- paste(y , "1", sep = "_")
+          
+              Bads[match(check, PARKsem$ID), c(v) ] <- 1
+        }
+      }
 
-        tempDF <- PARKsem[c(check),]  # create temporary dataframe which is subset of
-                                      # PARKsem where "nights*" == NA
 
-            check <- tempDF[na.omit(tempDF$overnight == 1) , "ID"]  # grab "ID"'s from temporary DF where
-                                                                    # overnight == 1.
-
-    v <- paste(y , "1", sep = "_")
-    Bads[c(check), c(v)] <- 1
-  }
-}
-
-      
 # overnight:
 # overnight_1: 
 # Check to see if respondant refused to answer overnight (or if RSG did not fill in).  
@@ -237,9 +239,16 @@ check <- PARKsem[is.na(PARKsem$overnight) &
 #     y <- append(y, x)
 #   }
 # }
-# tempDF <- PARKsem[,c("ID", "overnight", c(y))] 
-#     check <- tempDF[c(na.omit(tempDF$overnight == 1) == TRUE), "ID"]
-#       tempDF <- tempDF[check,]
+#       for (x in 1:length(PARKsem$ID)){
+#         # if (exists(y, where = PARKsem) == TRUE){
+#           
+#           check <- na.omit(PARKsem[with(PARKsem, 
+#                                         overnight == 1 & 
+#                                           PARKsem[c(y)]>= 1), "ID"])
+#           
+#           Bads[match(check, PARKsem$ID), c(v) ] <- 1
+#         }
+#       }
       
       ############### finish overnight_3 ###############
       
@@ -255,7 +264,7 @@ check <- PARKsem[is.na(PARKsem$hoursPark) &
       
       # NOTE: hoursPark_1 == 1 implies daysPark == 1 in PARKsem
       
-# hoursPark_2:
+# hoursPark_2:        ######## NOT WORKING CORRECTLY ######
 # Check to see if respondant answered >24 hours
 check <- PARKsem[(na.exclude(PARKsem$hoursPark) > 24),"ID"]   #NOT PULLING CORRECT ID'S   
 
@@ -322,7 +331,7 @@ check <- Bads[is.na(Bads$Sum) ,"ID"]
 # Store Bads data frame as PARKbads
 PARKbads <- Bads 
 
-CUVAbads <- PARKbads  #NOTE: modify this line for park of interest
+# CUVAbads <- PARKbads  #NOTE: modify this line for park of interest
 
 # Remove Bads dataframe
 rm(Bads, v, y, check)
