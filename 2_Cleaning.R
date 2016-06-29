@@ -227,7 +227,11 @@ check <- PARKsem[is.na(PARKsem$overnight) &
 
       Bads$overnight_2[c(check)] <- 1
 
+      
 # # # overnight_3:
+      
+      ############### finish overnight_3 ###############
+      
 # # # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
 #  SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
 #                         "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
@@ -250,7 +254,7 @@ check <- PARKsem[is.na(PARKsem$overnight) &
 #         }
 #       }
       
-      ############### finish overnight_3 ###############
+
       
 # hoursPark:
 # hoursPark_1:
@@ -264,11 +268,11 @@ check <- PARKsem[is.na(PARKsem$hoursPark) &
       
       # NOTE: hoursPark_1 == 1 implies daysPark == 1 in PARKsem
       
-# hoursPark_2:        ######## NOT WORKING CORRECTLY ######
+# hoursPark_2:        
 # Check to see if respondant answered >24 hours
-check <- PARKsem[(na.exclude(PARKsem$hoursPark) > 24),"ID"]   #NOT PULLING CORRECT ID'S   
+check <- na.omit(PARKsem[((PARKsem$hoursPark > 24)==TRUE),"ID"])     
 
-Bads$hoursPark_2[c(check)] <- 1
+Bads[match(check, PARKsem$ID), "hoursPark_2"]  <- 1
       
       
 # daysPark:
@@ -285,7 +289,7 @@ Bads$daysPark_1[c(check)] <- 1
 check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
       check <- na.omit(check)
       
-Bads$daysPark_2[c(check)] <- 1
+Bads[match(check, PARKsem$ID), "daysPark_2"] <- 1
       
 
 #***************************************************************************************************
