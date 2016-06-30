@@ -32,3 +32,5 @@ barplot(frqLocal$per,
         las=1, 
         main="Percent of local and non-local visitors",
         names.arg = c(levels(local)))
+
+
