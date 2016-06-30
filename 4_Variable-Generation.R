@@ -44,41 +44,36 @@ source("2_Cleaning.R")
 PARKsegments <- PARKsem
 
 # Create a vector of "ID"'s which cannot be identified as local | nonlocal
-badLocal <- PARKbads[PARKbads$local_1 == 1 , "ID"]  
+BADlocal_1 <- PARKbads[PARKbads$local_1 == 1 , "ID"]  
 
 # Create a vector of "ID"'s which do not identify day | overnight trip
-badOvernight <- PARKbads[PARKbads$overnight_1 == 1 , "ID"]
+BADovernight_1 <- PARKbads[PARKbads$overnight_1 == 1 , "ID"]
 
-      # NOTE: This would be a good point for "overnight_3" check to drop invalid lodging data
+# Create a vewctor of "ID"'s which have incomplete accommodation data
+      # NOTE: maybe run this code later?  If respondent identified themselves as day/overnight, 
+      # we could still use them for share day vs. overnight share?
 
-# Drop the observations from PARKsegments by "ID" using badLocal & badOvernight
-IDdrop <- as.factor(union(badLocal, badOvernight))
+BADovernight_3 <- PARKbads[PARKbads$overnight_3 == 1, "ID"]
 
+# Compile the list of "ID"'s into a vector (union of the three vectors)
+IDdrop <- as.factor(union(BADlocal_1, BADovernight_1))
+    
+    IDdrop <- as.factor(union(IDdrop, BADovernight_3))  # NOTE: union() can only be applied between 2 vectors 
+                                                        # at a time
+# Drop the observations from PARKsegments 
 PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
-
-row.names(PARKsegments) <- NULL   
 
       # NOTE: the match() function ensures that we are selecting observations by their unique ID value
       #       rather than their row/column index
 
+# Reset the row numbers to a complete sequence from 1:n
+row.names(PARKsegments) <- NULL   
 
 # PARKsegments is now our subsetted data set (from PARKsem) that can be used for segment analysis
-head(PARKsegments)  
+      head(PARKsegments)  
 
 ###########################################################################################
-#***************** Begin Finding Segment Shares *******************************************
-# Begin finding shares:
-n <- length(PARKsegments$overnight)
-
-n_overnight <- sum((PARKsegments[,"overnight"]==1)) 
-# NOTE:  if you recieve "NA" rather than a number, the data is not suffieciently cleaned
-n_day <- sum((PARKsegments[,"overnight"] == 0))
-
-ON_share <- n_overnight/n
-
-    # check for consistancy
-    n_overnight == (n - n_day)   # "TRUE" is good
-
+#***************** Categorize Observations by Accomodation ********************************
 
 # Add columns to PARKsegments to classify each observation
 # Each column is initially a vector of zeros
@@ -92,7 +87,7 @@ PARK_SegmentVars <- NULL
 for (y in SegmentVars){
   if (exists(y, where = PARKsegments) == TRUE){
     
-        PARK_SegmentVars <- append(PARK_SegmentVars, y)   # vector of segments for use later
+        PARK_SegmentVars <- append(PARK_SegmentVars, y)   # vector of segments specific to PARK for use later
       
         v <- paste(substring(y,7),
                    "nonlocal", sep = "_")   # This code reads:
@@ -110,145 +105,113 @@ PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
 
 
 # Fill in zeros for overnights that only answered select accomodation categories (changing NA to zeros)
+        # NOTE: The assumption being made here is that if the respondent identified themselves as overnight and 
+        # identified at least one accomodation type for one or more nights, than any other accomodation types 
+        # unanswered should be zero (replace NA with zero)
+
 for (y in PARK_SegmentVars){
+  
   z <- paste(y, "1", sep = "_")
 
-  IDfix <- PARKbads[PARKbads[,z]==1, "ID"]
+      IDfix <- PARKbads[PARKbads[,z]==1, "ID"]
 
-  PARKsegments[c(IDfix), c(y)] <- 0
+          PARKsegments[c(IDfix), c(y)] <- 0
 
 }
 
+# Categorize all nonlocal repondants by accomodation type. Create a vector of "ID"'s which are overnight 
+# but do not identify any type of accomodation type 
 
-badNights <- as.character(NULL)
+badNights <- as.character(NULL) # Will capture "ID"s with incomplete data
 
 for (x in 1:length(PARKsegments$local)){
   if (as.integer(PARKsegments$local[x])== 0 &
-      as.integer(PARKsegments$overnight[x]) == 1){
+      as.integer(PARKsegments$overnight[x]) == 1){  # Confine loop to only nonlocal & overnight 
           
           maxNightsType <- colnames(PARKsegments[c(x),PARK_SegmentVars])[max.col(PARKsegments[c(x),PARK_SegmentVars],
                                                                                 ties.method="first")]
-          maxNights <- max(PARKsegments[c(x), PARK_SegmentVars])
-          # ties.method = "first" returns the first value in the vector. Find a way to sort this out, maybe noting these 
-          # ID values for later use.
+                # maxNightsType: vector specifying the type of accomodation with the largest number of nights provided
+                      # NOTE: maxNightsType = NA if any nights* category is NA
           
-          if (is.na(maxNightsType) | as.character(maxNights) == 0){
-              badNights <- append(badNights, as.character(PARKsegments$ID[x])) 
+          # NOTE: ties.method = "first" returns the first value in the vector, problem when all accomodation 
+          # types are equal (most likely all zeros)
+          
+          maxNights <- max(PARKsegments[c(x), PARK_SegmentVars])
+          minNights <- min(PARKsegments[c(x), PARK_SegmentVars])
+                # maxNights/minNights: vector specifying the largest/smallest integer value of nights given.
+          
+          if (is.na(maxNightsType) | 
+              as.character(maxNights) == 0 |
+              as.character(maxNights) == as.character(minNights)){ # collect "ID"'s for problematic observations 
+                    badNights <- append(badNights, as.character(PARKsegments$ID[x])) 
           }
           
-          else {
+          else { # If the observation is clean, categorize it accordingly
               v <- paste(substring(maxNightsType, 7), "nonlocal", sep = "_")
           
-          PARKsegments[x,v] <- 1
+                  PARKsegments[x,v] <- 1
         }
     }
 }
 
-PARKsegments$ID[c(badNights)] # just drop these variables for the time being
+PARKsegments <- PARKsegments[-c(match(badNights, PARKsegments$ID)),] # just drop these variables for the time being 
+    row.names(PARKsegments) <- NULL   # Reset row names
+
+###########################################################################################
+#***************** Generate Segment Shares ************************************************
+    
+# Number of remaining observations 
+    n <- length(PARKsegments$overnight)
+    
+# Number of overnight & day observations (overall)
+    n_overnight <- sum((PARKsegments[,"overnight"]==1)) 
+        # NOTE:  if you recieve "NA" rather than a number, the data is not suffieciently cleaned
+    n_day <- sum((PARKsegments[,"overnight"] == 0))
+
+# Overnight and day shares
+    ON_share <- n_overnight/n
+    DAY_share <- n_day/n
+    
+    # Sanity check
+    n_overnight == (n - n_day)   # "TRUE" = all good!
+    
+          # NOTE: think about how we want to start collecting variables such as ON_share. 
+          # Put in matrix?
+
+# Shares for day observations (by local)
+    n_daylocal <- sum((PARKsegments[,"day_local"]==1))
+    n_daynonlocal <- sum(PARKsegments[, "day_local"]==0)
+    
+        DAYlocal_share <- n_daylocal/n
+        DAYnonlocal_share <- n_daynonlocal/n
+    
+
+# Get shares by accomodation type for nonlocal observations
+a <- NULL
+b <- NULL
+c <- NULL
+
+    for (y in PARK_SegmentVars){
+      v <- paste(substring(y, 7), "nonlocal", sep = "_")
+            x <- sum(PARKsegments[, v]==1)
+            z <- x/n
+                assign((paste(v, "share", sep = "_")), x )
+                    a <- append(a, v)
+                    b <- append(b, z)
+                    c <- append(c, x)
+    }
+
+                    a <- append(c("Overall", "Overnight", "Day", "Day_Local", "Day_NonLocal"), a)
+                    b <- append(c(1,ON_share, DAY_share, DAYlocal_share, DAYnonlocal_share), b)
+                    c <- append(c(n, n_overnight, n_day, n_daylocal, n_daynonlocal), c)
+
+PARKshares_table <- data.frame(SEGMENT = a, SHARE = b, OBSERVATIONS = c)  
 
 
-
+###########################################################################################
+#***************** Generate Spending Profiles *********************************************
+    
 
 
 # write.csv(PARKsegments, "PARKsegments.csv", row.names = FALSE)
 
-# SAVING THE SCRIPT BELOW FOR REFERENCE #
-
-###########################################################################################
-#***************** SEGMENT VARIABLE CREATION & ANALYSIS ***********************************
-
-# The park specific data frame will be called "PARKsegments" and will be used for 
-# segment analysis
-
-# Subset data by droping observations which do not match rules:
-
-# RULE_1: Must have answered local (from PARKbads, local_1 == 0)
-       
-      # NOTE: we could write additional check to fill in missing "local" values. 
-      # For example, if local == NA, but zip == "some country" then we can assign 
-      # observation to non-local category
-       
-# RULE_2: Must have answered overnight or have sufficient data to assign day or ON trip
-
-            # (e.g. within PARKbads, overnight_1 == 0 & daysPark_1 == 0)
-            # IDpassR1 <- PARKbads[PARKbads$local_1 == 0 , "ID"]  #rule 1
-            #     PARKsegments <- PARKsem[c(IDpassR1),] 
-            # 
-            # IDpassR2 <- PARKbads[PARKbads$overnight_1 == 0 &
-            #                      PARKbads$daysPark_1 == 0 , "ID"] #rule 2
-            # 
-            # PARKsegments <- PARKsegments[na.omit(match(IDpassR2, PARKsegments$ID)),]
-            
-            # Try to drop observations, rather than keep
-
-
-# # Create PARKsegments data frame from PARKsem data 
-# PARKsegments <- PARKsem
-# 
-# # Rule 1: create a vector of "ID"'s which do not satisfy rule 1:
-# r1Fail <- PARKbads[PARKbads$local_1 == 1 , "ID"]  #rule 1
-# 
-# # Rule 2: create a vector of "ID"'s which do not satisfy rule 2. 
-# # First, use overnight_1 and hoursPark_1 to fill in incomplete observations:
-# r2Check <- PARKbads[PARKbads$overnight_1 == 1 &
-#                       PARKbads$hoursPark_1 == 1 , "ID"]
-# 
-# # The vector r2Check is a list of "ID"'s which are incomplete but can be assigned
-# # day trip category.  Change overnight == NA to overnight == 0
-# PARKsegments$overnight[c(r2Check)] <- 0
-# 
-# # Collect "ID"s which do not satisfy rule 2
-# r2Fail <- PARKbads[PARKbads$overnight_1 == 1, "ID"]
-# 
-# # Remove from r2Fail the ID's which have been corrected using r2Check
-# r2Fail <- as.factor(setdiff(r2Fail, r2Check))
-# 
-# # Drop the observations from PARKsegments which fail Rule 1 and Rule 2:
-# IDdrop <- as.factor(union(r1Fail, r2Fail))
-# 
-# PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
-#   head(PARKsegments)  #this is our subsetted data for analysis
-#   
-# # Begin finding shares:
-# n <- length(PARKsegments$overnight)
-# 
-# n_overnight <- sum((PARKsegments[,"overnight"]==1)) 
-#       # NOTE:  if you recieve "NA" rather than a number, the data is not suffieciently cleaned
-# n_day <- sum((PARKsegments[,"overnight"] == 0))
-# 
-#     ON_share <- n_overnight/n
-#     
-# # check for consistancy
-#   n_overnight == (n - n_day)   # "TRUE" is good
-#   
-# 
-# # Add columns to PARKsegments to classify each observation
-# # Each column is initially a vector of zeros
-# PARKsegments$day_local <- 0
-# 
-# nonlocal_Segments <- c("day", "CampIn", "CampOut" , "LodgeIn", "LodgeOut", "Other")
-# 
-# Segments_colnames <- paste("nights", c("CampIn", "CampOut" , "LodgeIn", "LodgeOut", "Other"), sep = "")
-# 
-# for (y in nonLocal_Segments){
-#   v = paste(y , "nonlocal", sep = "_")
-#    
-#   PARKsegments[,v] <- 0
-# }
-# 
-# 
-# PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
-#                          as.numeric(PARKsegments$overnight)==0 ] <- 1
-# 
-# PARKsegments$day_nonlocal[as.integer(PARKsegments$local)==0 &
-#                          as.numeric(PARKsegments$overnight)==0 ] <- 1
-# 
-# ### try using "aggregate" function ####
-# ### http://stackoverflow.com/questions/25314336/how-to-extract-the-maximum-value-within-each-group-in-a-data-frame
-# for (x in PARKsegments[,"overnight"]){
-#   if (as.numeric(x) == 1){
-#      max(as.integer(PARKsegments[x, c(Segments_colnames)]) >=1 )
-# }
-# }
-# 
-# 
