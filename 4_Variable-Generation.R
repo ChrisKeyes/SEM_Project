@@ -77,7 +77,8 @@ row.names(PARKsegments) <- NULL
 
 # Add columns to PARKsegments to classify each observation
 # Each column is initially a vector of zeros
-PARKsegments$day_local <- 0
+
+      # PARKsegments$day_local <- 0
 
 SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
@@ -99,9 +100,15 @@ for (y in SegmentVars){
   }
 }
 
-# Identify local day trip observations
-PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
-                         as.numeric(PARKsegments$overnight)==0 ] <- 1
+# Identify local day trip and local overnight observations
+PARKsegments$day_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 1, 1, 0)
+PARKsegments$overnight_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 1, 1,0 )
+
+# PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
+#                          as.numeric(PARKsegments$overnight)==0 ] <- 1
+# 
+# PARKsegments$overnight_local[as.integer(PARKsegments$local)==1 &
+#                                as.numeric(PARKsegments$overnight)==1 ] <- 1
 
 
 # Fill in zeros for overnights that only answered select accomodation categories (changing NA to zeros)
@@ -178,14 +185,15 @@ PARKsegments <- PARKsegments[-c(match(badNights, PARKsegments$ID)),] # just drop
           # NOTE: think about how we want to start collecting variables such as ON_share. 
           # Put in matrix?
 
-# Shares for day observations (by local)
+# Shares for day and overnight observations 
     n_daylocal <- sum((PARKsegments[,"day_local"]==1))
     n_daynonlocal <- sum(PARKsegments[, "day_local"]==0)
+    n_overnightlocal <- sum((PARKsegments[, "overnight_local"] == 1))
     
         DAYlocal_share <- n_daylocal/n
         DAYnonlocal_share <- n_daynonlocal/n
-    
-
+        ONlocal_share <- n_overnightlocal/n
+        
 # Get shares by accomodation type for nonlocal observations
 a <- NULL
 b <- NULL
@@ -201,9 +209,9 @@ c <- NULL
                     c <- append(c, x)
     }
 
-                    a <- append(c("Overall", "Overnight", "Day", "Day_Local", "Day_NonLocal"), a)
-                    b <- append(c(1,ON_share, DAY_share, DAYlocal_share, DAYnonlocal_share), b)
-                    c <- append(c(n, n_overnight, n_day, n_daylocal, n_daynonlocal), c)
+                    a <- append(c("Overall", "Overnight", "Day", "Day_Local", "Day_NonLocal", "Overnight_Local"), a)
+                    b <- append(c(1,ON_share, DAY_share, DAYlocal_share, DAYnonlocal_share, ONlocal_share), b)
+                    c <- append(c(n, n_overnight, n_day, n_daylocal, n_daynonlocal, n_overnightlocal), c)
 
 PARKshares_table <- data.frame(SEGMENT = a, SHARE = b, OBSERVATIONS = c)  
 
