@@ -13,8 +13,8 @@ hoursParkF
 levels(hoursParkF)
 summary(hoursParkF)
 plot(hoursParkF, main="Hours spent in park")
-#who is the person who spent 25 hours in the park?
-check <- PARKsem[CUVAsem$hoursPark >24, c("ID")] #this isn't quite working
+#who are the people who spent 25 hours in the park?
+check <- PARKbads[with(PARKbads, hoursPark_2==1), c("ID")] 
 
 #I'm remaking a bads matrix here (temporary) to play with 
 Bads <- data.frame(PARKsem$ID, row.names = NULL)
