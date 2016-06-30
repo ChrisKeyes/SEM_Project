@@ -56,6 +56,8 @@ IDdrop <- as.factor(union(badLocal, badOvernight))
 
 PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
 
+row.names(PARKsegments) <- NULL   
+
       # NOTE: the match() function ensures that we are selecting observations by their unique ID value
       #       rather than their row/column index
 
@@ -85,12 +87,12 @@ PARKsegments$day_local <- 0
 SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
-PARKsegmentvars <- NULL
+PARK_SegmentVars <- NULL
 
 for (y in SegmentVars){
   if (exists(y, where = PARKsegments) == TRUE){
     
-        PARKsegmentvars <- append(PARKsegmentvars, y)   # vector of segments for use later
+        PARK_SegmentVars <- append(PARK_SegmentVars, y)   # vector of segments for use later
       
         v <- paste(substring(y,7),
                    "nonlocal", sep = "_")   # This code reads:
@@ -102,45 +104,50 @@ for (y in SegmentVars){
   }
 }
 
-
+# Identify local day trip observations
 PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
                          as.numeric(PARKsegments$overnight)==0 ] <- 1
 
-### try using "aggregate" function ####
-### http://stackoverflow.com/questions/25314336/how-to-extract-the-maximum-value-within-each-group-in-a-data-frame
-# for (x in PARKsegments[,"overnight"]){
-#   if (as.numeric(x) == 1){
-#     max(as.integer(PARKsegments[x, c(Segments_colnames)]) >=1 )
-#   }
-# }
-# 
-# apply( x , 1, function(x) which(x==max(x))) %>%
-#          x <- PARKsegments[ y , PARKsegmentvars] %>%
-#          y <- c(with(PARKsegments, overnight == 1)) 
-            
-# maxNightsType <- colnames(PARKsegments[,PARKsegmentvars])[max.col(PARKsegments[,PARKsegmentvars],ties.method="first")]  
-badNights <- NULL
+
+# Fill in zeros for overnights that only answered select accomodation categories (changing NA to zeros)
+for (y in PARK_SegmentVars){
+  z <- paste(y, "1", sep = "_")
+
+  IDfix <- PARKbads[PARKbads[,z]==1, "ID"]
+
+  PARKsegments[c(IDfix), c(y)] <- 0
+
+}
+
+
+badNights <- as.character(NULL)
+
 for (x in 1:length(PARKsegments$local)){
-  if(as.integer(PARKsegments$local[x])==0 &
-     as.integer(PARKsegments$overnight[x] == 1)){
-          maxNightsType <- colnames(PARKsegments[c(x),PARKsegmentvars])[max.col(PARKsegments[c(x),PARKsegmentvars],
-                                                                                ties.method="first")]  
+  if (as.integer(PARKsegments$local[x])== 0 &
+      as.integer(PARKsegments$overnight[x]) == 1){
+          
+          maxNightsType <- colnames(PARKsegments[c(x),PARK_SegmentVars])[max.col(PARKsegments[c(x),PARK_SegmentVars],
+                                                                                ties.method="first")]
+          maxNights <- max(PARKsegments[c(x), PARK_SegmentVars])
           # ties.method = "first" returns the first value in the vector. Find a way to sort this out, maybe noting these 
           # ID values for later use.
           
-          if(is.na(maxNightsType)){
-            badNights <- append(badNights, PARKsegments$ID[x])
+          if (is.na(maxNightsType) | as.character(maxNights) == 0){
+              badNights <- append(badNights, as.character(PARKsegments$ID[x])) 
           }
+          
           else {
-          v <- paste(substring(maxNightsType, 7),
-                     "nonlocal", sep = "_")
+              v <- paste(substring(maxNightsType, 7), "nonlocal", sep = "_")
           
           PARKsegments[x,v] <- 1
         }
     }
 }
 
-badNights <- PARKsegments[c(badNights), "ID"]   # INCORPORATE THIS LOOP INTO BADS MATRIX
+PARKsegments$ID[c(badNights)] # just drop these variables for the time being
+
+
+
 
 
 # write.csv(PARKsegments, "PARKsegments.csv", row.names = FALSE)

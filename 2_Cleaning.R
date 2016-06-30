@@ -228,34 +228,34 @@ check <- PARKsem[is.na(PARKsem$overnight) &
       Bads$overnight_2[c(check)] <- 1
 
       
-# # # overnight_3:
+# overnight_3:
+# Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
       
-      ############### finish overnight_3 ###############
-      
-# # # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
-#  SegmentVars <- c("nightsBackcountry", "nightsCampin", "nightsCampOut",
-#                         "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
-#   
+PARK_SegmentVars <- NULL
 
-# y <- NULL
-# for (x in SegmentVars){
-#   if (exists(x, where = PARKsem)){
-#     y <- append(y, x)
-#   }
-# }
-#       for (x in 1:length(PARKsem$ID)){
-#         # if (exists(y, where = PARKsem) == TRUE){
-#           
-#           check <- na.omit(PARKsem[with(PARKsem, 
-#                                         overnight == 1 & 
-#                                           PARKsem[c(y)]>= 1), "ID"])
-#           
-#           Bads[match(check, PARKsem$ID), c(v) ] <- 1
-#         }
-#       }
-      
+      for (y in SegmentVars){
+        if (exists(y, where = PARKsem) == TRUE){
 
-      
+          PARK_SegmentVars <- append(PARK_SegmentVars, y)
+        }
+      }
+
+      for (x in 1:length(PARKsem$ID)){
+          if(is.na(PARKsem$overnight[x]) == FALSE &
+             as.integer(PARKsem$overnight[x]) == 1){
+
+          MaxNight <- max(PARKsem[x ,PARK_SegmentVars])
+                              
+
+              if(is.na(MaxNight) == FALSE &
+                 as.integer(MaxNight) == 0) {
+                   
+                Bads$overnight_3[x] <- 1
+              }
+          }
+      }
+
+
 # hoursPark:
 # hoursPark_1:
 # Check for NULL observations in hoursPark, daysPark, and overnight. If all three variables are 
