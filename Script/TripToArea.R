@@ -2,6 +2,28 @@
 
 PARKsem <- TESTdata
 
+setwd("~/SEM_Project")
+
+#build a subset dataframe from PARKsem
+df <- data.frame(PARKsem$ID, row.names = NULL)
+colnames(df) <- "ID"
+df$ID <- sort(df$ID, decreasing = FALSE)
+
+GROUPvars <- read.csv("GROUPvars.csv")
+TripToAreaVars <- GROUPvars$TripToArea 
+TripToAreaVars <- na.omit(TripToAreaVars)
+
+#Cathy, start here. You are trying to build a data frame that has all of the columns indicated in the
+#GROUPvars csv.
+for (y in 1:length(TripToAreaVars)){
+  var <- TripToAreaVars[y]
+  df$var <- PARKsem[,var]
+}
+colnames(df,c("ID",TripToAreaVars))
+
+#next remove bads
+#...
+
 #Evaluate the time spent in the park
 #associated SEMvars are hoursPark and daysPark. 
 #create a new variable daysParkAdj that estimates number of days in the park
