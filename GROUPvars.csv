@@ -1,4 +1,12 @@
 ExpVariables,TripToArea
-,ID
 ,hoursPark
 ,daysPark
+,overnight
+,nightsCampIn
+,nightsCampOut
+,nightsLodgeIn
+,nightsLodgeOut
+,nightsOther
+,tripPurpose
+,equallyNearby
+,primaryNearby
