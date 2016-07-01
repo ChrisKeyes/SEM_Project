@@ -1,8 +1,11 @@
 #This script develops variables and statistics for Qs related to visitors trip to the area
 
-PARKsem <- TESTdata
+
 
 setwd("~/SEM_Project")
+source("2_Cleaning.R")
+
+PARKsem <- TESTdata
 
 #build a subset dataframe from PARKsem
 df <- data.frame(PARKsem$ID, row.names = NULL)
@@ -15,11 +18,16 @@ TripToAreaVars <- na.omit(TripToAreaVars)
 
 #Cathy, start here. You are trying to build a data frame that has all of the columns indicated in the
 #GROUPvars csv.
-for (y in 1:length(TripToAreaVars)){
-  var <- TripToAreaVars[y]
-  df$var <- PARKsem[,var]
-}
-colnames(df,c("ID",TripToAreaVars))
+
+# for (y in 1:length(TripToAreaVars)){
+#   var <- TripToAreaVars[y]
+#   df$var <- PARKsem[,var]
+# }
+
+# colnames(df,c("ID",TripToAreaVars))
+
+CHRISdf <- data.frame(PARKsem[,match(TripToAreaVars, colnames(PARKsem))]) # This should do it
+
 
 #next remove bads
 #...
