@@ -29,18 +29,17 @@ for (x in PARKexp){
   PARKsegments[,x] <- ifelse(is.na(PARKsegments[,x]),0,PARKsegments[,x])
 }
 
+PARKspending_MEANS <- data.frame(EXPENDITURES = PARKexp)
 
 
-
-             a <- NULL # colnames by segment
-             b <- NULL # mean values
-             segmentVARS <- NULL # segment names
+a <- NULL # colnames by segment
+b <- NULL # mean values
+segmentVARS <- NULL # segment names
              
-            for (x in PARKnights){
-              v <- paste(substring(x, 7), "nonlocal", sep = "_")
-              segmentVARS <- append(segmentVARS, v)
-            }
-PARKspending <- data.frame(EXPENDITURE = PARKexp)
+for (x in PARKnights){
+   v <- paste(substring(x, 7), "nonlocal", sep = "_")
+        segmentVARS <- append(segmentVARS, v)
+}
 
 for (x in segmentVARS){
   
@@ -53,64 +52,15 @@ for (x in segmentVARS){
   }
     df <- data.frame(EXPENDITURES = PARKexp, x = b)
         colnames(df) <- c("EXPENDITURES" , x)
-            assign(x, df)
-        b <- NULL
+        
+        PARKspending_MEANS <- merge(PARKspending_MEANS, df, by = c("EXPENDITURES"))
+            b <- NULL
 }
 
              
 
     
-for (x in segmentVARS) {
-  avg <- mean(data.frame(x)[])
-}
-
-
-for (y in PARKexp)
-      
-        avg <- mean(z[,y])
-            a <- append(a, y)
-            b <- append(b, avg)
-    
-    # else {
-    #   avg <- c(z[,y])
-    #       a <- append(a, y)
-    #       b <- append(b, avg)
-    #   
-    #  
-    
-  df <- data.frame(EXP = c(a) , SEG = c(b))
-  assign(x, df)
-}
 
 
 
 
-            # 
-            # 
-            # PARKspending <- data.frame(EXPENDITURE = PARKexp, row.names = PARKexp)
-            # 
-            # for (x in c){
-            #   z <- subset(PARKsegments, PARKsegments[,x]==1, select = c(PARKexp))w
-            #   
-            #   if (length(z[,1]) == 1) {
-            #     
-            #     df <- data.frame(matrix(unlist(z)), row.names = PARKexp) #  c(subset(PARKsegments,PARKsegments[,x] == 1, select = c(PARKexp)))))
-            #       colnames(df) <- c(x)  
-            #           assign(x,df)
-            #           
-            #   }
-            #   else {
-            #     df <- data.frame(matrix(unlist(c(colMeans(z)))), row.names = PARKexp)
-            #         colnames(df) <- c(x) #subset(PARKsegments, PARKsegments[,x] == 1, select = c(PARKexp))))))
-            #           assign(x, df)
-            #     
-            #   }
-            #   
-            # }
-
-
-
-
-
-# almost there with this loop, should convert "NA"'s to 0 using BADS before running this and 
-# need to verify values being produced.
