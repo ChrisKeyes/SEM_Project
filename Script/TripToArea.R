@@ -8,25 +8,12 @@ source("2_Cleaning.R")
 PARKsem <- TESTdata
 
 #build a subset dataframe from PARKsem
-df <- data.frame(PARKsem$ID, row.names = NULL)
-colnames(df) <- "ID"
-df$ID <- sort(df$ID, decreasing = FALSE)
 
 GROUPvars <- read.csv("GROUPvars.csv")
 TripToAreaVars <- GROUPvars$TripToArea 
 TripToAreaVars <- na.omit(TripToAreaVars)
 
-#Cathy, start here. You are trying to build a data frame that has all of the columns indicated in the
-#GROUPvars csv.
-
-# for (y in 1:length(TripToAreaVars)){
-#   var <- TripToAreaVars[y]
-#   df$var <- PARKsem[,var]
-# }
-
-# colnames(df,c("ID",TripToAreaVars))
-
-CHRISdf <- data.frame(PARKsem[,match(TripToAreaVars, colnames(PARKsem))]) # This should do it
+df <- data.frame(PARKsem[,match(TripToAreaVars, colnames(PARKsem))])
 
 
 #next remove bads
