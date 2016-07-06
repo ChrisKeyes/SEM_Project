@@ -6,11 +6,11 @@ nightsLodgeIn,expPubTrans,nightsCampIn
 nightsLodgeOut,expRestaurants,nightsCampOut
 nightsCruise,expSnacks,nightsLodgeIn
 ,expGroceries,nightsLodgeOut
-,expHotels,nightsOther
-,expSpecLodge,tripPurpose
-,expcamp,equallyNearby
-,expRec,primaryNearby
-,expSouvenirs,
+,expHotels,nightsCruise
+,expSpecLodge,nightsOther
+,expcamp,tripPurpose
+,expRec,equallyNearby
+,expSouvenirs,primaryNearby
 ,expEqpRental,
 ,expGuides,
 ,expRail,
