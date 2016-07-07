@@ -1,6 +1,6 @@
 
 # create vector of variable names which define which variable names to keep
-MATCHvars <- levels(SEMVars[,c(PARKname)])
+MATCHvars <- levels(SEMvars[,c(PARKname)])
       MATCHvars <- MATCHvars[which(MATCHvars != c(""))]  # remove any NULL values
 
 SEARCHvars <- NULL
@@ -10,17 +10,24 @@ SEARCHvars <- append(SEARCHvars, c(grep(x, colnames(PARKdata))))
 
 
 # subset data on the selected variable names 
+for (x in MATCHvars){
+  y <- subset(PARKdata, select = x )
+}
 
-PARKsem <- PARKdata[,match(c(MATCHvars), colnames(PARKdata))]  
+    rm(y)
+    
+PARKsem <- subset(PARKdata, select = c(MATCHvars))
+
+# PARKsem <- PARKdata[,match(c(MATCHvars), colnames(PARKdata))]  
   
 #Rename the variables to SEMvars for consistancy
 colIndex <- NULL
 for (r in MATCHvars){
-  i <- which(SEMVars[c(PARKname)] == r)
+  i <- which(SEMvars[c(PARKname)] == r)
   colIndex <- append(colIndex, i)
 }
   
-colnames(PARKsem) <- SEMVars$SEMvars[c(colIndex)]
+colnames(PARKsem) <- SEMvars$SEMvars[c(colIndex)]
   
 # End of script - Move to cleaning script
 setwd("~/SEM_Project")
