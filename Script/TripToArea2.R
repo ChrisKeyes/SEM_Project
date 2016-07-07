@@ -58,6 +58,12 @@ df["overnight"][is.na(df["overnight"]) & df["nightsLocalArea"]>0] <- 1
 df$daysLocalArea <- ifelse(df$overnight == 0 & df$nightsLocalArea == 0, 1, 
                            ifelse(df$overnight == 1 & df$nightsLocalArea > 0, df$nightsLocalArea + 1, 
                                   0))
+
+df$daysLocalAreaCHECK <- ifelse((df$overnight == 0 | is.na(df$overnight)) & df$nightsLocalArea == 0, 1, 
+                           ifelse(df$overnight == 1 & df$nightsLocalArea > 0, df$nightsLocalArea + 1, 
+                                  0))
+      # If overnight == NA & nightsLocalArea == 0, should we just assume daysLocalArea = 1 since they took the survey?
+
 #drop observations for which daysLocalArea == 0 or na
 df <- subset(df, df$daysLocalArea > 0 | !is.na(df$daysLocalArea))
 #remove outliers (for now... remove if daysLocalArea >14)
