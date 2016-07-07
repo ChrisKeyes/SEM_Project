@@ -46,10 +46,17 @@ for (x in segmentVARS){
   z <- subset(PARKsegments, PARKsegments[,x] == 1, select = c(PARKexp))
   expV <- colnames(z)
   
-  for (y in 1:length(expV)){
-      avg <- mean(z[,y])
+  # for (y in 1:length(expV)){
+  #     avg <- mean(z[,y])
+  #         b <- append(b, avg)
+  # }
+  
+  for (y in expV){
+    avg <- mean(z[,y])
           b <- append(b, avg)
   }
+  
+  
     df <- data.frame(EXPENDITURES = PARKexp, x = b)
         colnames(df) <- c("EXPENDITURES" , x)
         

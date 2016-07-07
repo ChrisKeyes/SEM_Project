@@ -3,8 +3,8 @@
 source("~/SEM_Project/Script/getParkName.R")
 source("~/SEM_Project/Script/getSEMvars.R")
 
-SEMvars <- read.csv("~/SEM_Project/SEMvars.csv")
-GROUPvars <- read.csv("~/SEM_Project/GROUPvars.csv")
+SEMvars <- read.csv("~/SEM_Project/SEMvars.csv", header = TRUE)
+GROUPvars <- read.csv("~/SEM_Project/GROUPvars.csv", header = TRUE)
 
 setwd("~/SEM_Project/Data")
 
@@ -13,22 +13,31 @@ DataNameVector <- c(NULL)
 
 
 for (dataset in Parklist){
-  x <- dataset 
+  DATA <- dataset 
   
-  if(x != "TESTdata.csv"){
+  if(DATA != "TESTdata.csv"){
     
-    PARK <- substr(x, 1, 4)
+    PARK <- substr(DATA, 1, 4)
         PARKdata <- paste(PARK, "data", sep = "")
             DataNameVector <- append(DataNameVector, PARKdata)
     
     
-    filename <- paste("~/SEM_Project/Data", x,sep = "/")
+    filename <- paste("~/SEM_Project/Data", DATA,sep = "/")
     
-    PARKdata <- read.csv(filename)
+    PARKdata <- read.csv(filename, header = TRUE)
     PARKname <-  PARK  
     
 source("~/SEM_Project/PracticeFiles/Script1-TEST.R")
+
+          if( PARK == "YOSE"){
+            PARKsem$local <- abs(PARKsem$local - 2)
+          }
+
 source("~/SEM_Project/PracticeFiles/Script2-TEST.R")
+
+source("~/SEM_Project/PracticeFiles/Script4-TEST.R")
+    
+source("~/SEM_Project/PracticeFiles/Script5-TEST.R")
     
     setwd("~/SEM_Project/Output")
       PARKfile <- paste(getwd(),
@@ -45,6 +54,12 @@ source("~/SEM_Project/PracticeFiles/Script2-TEST.R")
     # assign(paste(PARK, "sem", sep = ""), PARKsem)
     # assign(paste(PARK, "bads", sep = ""), PARKbads)
     # assign(paste(PARK, "data", sep = ""), PARKdata)
+
+    
+   
+    write.csv(PARKsegments, paste(PARK, "segments.csv", sep = ""), row.names = FALSE)
+    write.csv(PARKshares_table, paste(PARK, "shares_table.csv", sep = ""), row.names = FALSE)
+    write.csv(PARKspending_MEANS, paste(PARK, "mean_expenditures.csv", sep = ""), row.names = FALSE)
     
   }
   
@@ -53,17 +68,17 @@ source("~/SEM_Project/PracticeFiles/Script2-TEST.R")
 setwd("~/SEM_Project/Output")
 
 write.csv(SEMvars, paste(getwd(),
-                         "SEMvars.csv", sep = "/") , 
+                         "SEMvars.csv", sep = "/") ,
                           row.names = FALSE)
 
 write.csv(CHECKvars, paste(getwd(),
-                         "CHECKvars.csv", sep = "/") , 
+                         "CHECKvars.csv", sep = "/") ,
                           row.names = FALSE)
 
 write.csv(GROUPvars, paste(getwd(),
-                         "GROUPvars.csv", sep = "/") , 
+                         "GROUPvars.csv", sep = "/") ,
                           row.names = FALSE)
 
 
-rm(list=setdiff(ls(), c("SEMvars","CHECKvars", "GROUPvars", "DataNameVector"))) 
+rm(list=setdiff(ls(), c("SEMvars","CHECKvars", "GROUPvars", "DataNameVector")))
 

@@ -6,7 +6,7 @@ setwd("~/SEM_Project")
 
 ###################################################################################################
 # Upload the CHECKvars csv and store as "CHECKvars"
-CHECKvars <- read.csv("~/SEM_Project/CHECKVars.csv")
+CHECKvars <- read.csv("~/SEM_Project/CHECKVars.csv", header = TRUE)
 
 # Drop SEMvars which PARKsem does not contain. First create a vector of the variable names which
 # the park has (do not include "ID")
@@ -78,7 +78,8 @@ check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
                    as.numeric(PARKsem$zip) == 303 |
                    as.numeric(PARKsem$zip) == 304 |
                    as.numeric(PARKsem$zip) == 305 |
-                   as.numeric(PARKsem$zip) == 306 ,"ID"]    # "|" is the "or" syntax
+                   as.numeric(PARKsem$zip) == 306 ,"ID"]    
+# "|" is the "or" syntax
 
       Bads$zip_2[c(check)] <- 1
 

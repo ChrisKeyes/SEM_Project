@@ -101,8 +101,9 @@ for (y in SegmentVars){
 }
 
 # Identify local day trip and local overnight observations
-PARKsegments$day_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 1, 1, 0)
+PARKsegments$day_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 0, 1, 0)
 PARKsegments$overnight_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 1, 1,0 )
+PARKsegments$day_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments$overnight == 0, 1 , 0)
 
 # PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
 #                          as.numeric(PARKsegments$overnight)==0 ] <- 1
