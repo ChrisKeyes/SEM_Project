@@ -56,7 +56,7 @@ expGuides,,Q33l_Tours,Q27m_Guides,Q22m_Tours
 expRail,Railroad,Q33k_Railroad,,
 expOther,OtherExpen,Q33m_OtherExpen,Q27n_Other,Q22n_Other
 expOtherSpec,OtherExpenSpecify,Q33ma_OtherExpenSpecifyCoded,Q27o_OtherSpecify,Q22na_OtherSpecify_Cleaned
-expLocalTotal,,Q33_TotExpen,Q27_TotalExpenditures,
+expLocalTotal,,Q33_TotExpen,TotalExpenditures,
 DKexpLocal,,Q33n_DontKnow,Q27_DontKnow,Q22o_DontKnow
 expAdditional,AdditionalExpen999,,Q28_ExpOutShade,Q23a_OutAreaExp
 DKexpAdditional,,,Q28_DonTKnow,Q23b_OutAreaExpDK
