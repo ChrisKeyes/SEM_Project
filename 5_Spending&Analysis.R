@@ -6,7 +6,7 @@ setwd("~/SEM_Project")
 source("4_Variable-Generation.R")
 
 # Clear the environment except for the data we want
-rm(list=setdiff(ls(), c("CHECKvars", "PARKbads", "PARKsegments", "PARKsem", "PARKshares_table")))  # NOTE: once script is finalized, delete this line 
+# rm(list=setdiff(ls(), c("CHECKvars", "PARKbads", "PARKsegments", "PARKsem", "PARKshares_table")))  # NOTE: once script is finalized, delete this line 
 
 expVARS <- colnames(PARKbads[grepl(paste("^", "exp*", sep = ""),colnames(PARKbads))])
 nightsVARS <- colnames(PARKbads[grepl(paste("^", "nights*", sep = ""), colnames(PARKbads))])
@@ -64,7 +64,20 @@ for (x in segmentVARS){
             b <- NULL
 }
 
-             
+for (x in c("day_local", "overnight_local", "day_nonlocal")){
+  tempDF <-subset(PARKsegments, PARKsegments[x]==1, select = c(PARKexp))
+  
+  for (y in colnames(tempDF)){
+    avg <- mean(tempDF[,y])
+    b <- append(b, avg)
+  }
+  df <- data.frame(EXPENDITURES = PARKexp, x = b)
+  colnames(df) <- c("EXPENDITURES", x)
+  
+  PARKspending_MEANS <- merge(PARKspending_MEANS, df , by = c("EXPENDITURES"))
+  b <- NULL
+}
+
 
     
 
