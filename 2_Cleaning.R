@@ -1,4 +1,4 @@
-# THis script will use a series of conditional statements to identify missing, incomplete, and outlying observations.
+# This script will use a series of conditional statements to identify missing, incomplete, and outlying observations.
 # 
 # Use the script 1_Upload... to get the data
 setwd("~/SEM_Project")
@@ -219,41 +219,45 @@ check <- PARKsem[is.na(PARKsem$overnight) ,"ID"]
       Bads$overnight_1[c(check)] <- 1
 
 # overnight_2:
-# Check to identify observations with overnight==NA, but either daysPark >=0 or
-# hoursPark >=0 or both
-check <- PARKsem[is.na(PARKsem$overnight) &
-                   (is.na(PARKsem$hoursPark)==FALSE |
-                      is.na(PARKsem$daysPark)==FALSE) , "ID"]
+# Check to identify observations with overnight==NA, but with positive sum of overnight stays in the lodging sectors
+PARK_SegmentVars <- NULL
 
-      Bads$overnight_2[c(check)] <- 1
+for (y in SegmentVars){
+  if (exists(y, where = PARKsem) == TRUE){
+    
+    PARK_SegmentVars <- append(PARK_SegmentVars, y)
+  }
+}
 
+PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
+Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem["nightsLocalArea"]>0] <- 1
+#dfverify <- PARKsem[c("ID",PARK_SegmentVars,"nightsLocalArea","overnight")]
+
+      # check <- PARKsem[is.na(PARKsem$overnight) &
+      #              (is.na(PARKsem$hoursPark)==FALSE |
+      #                 is.na(PARKsem$daysPark)==FALSE) , "ID"]
+      # 
+      # Bads$overnight_2[c(check)] <- 1
       
 # overnight_3:
 # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
-      
-PARK_SegmentVars <- NULL
+Bads["overnight_3"][PARKsem["overnight"]==1 & PARKsem["nightsLocalArea"]==0] <- 1      
 
-      for (y in SegmentVars){
-        if (exists(y, where = PARKsem) == TRUE){
-
-          PARK_SegmentVars <- append(PARK_SegmentVars, y)
-        }
-      }
-
-      for (x in 1:length(PARKsem$ID)){
-          if(is.na(PARKsem$overnight[x]) == FALSE &
-             as.integer(PARKsem$overnight[x]) == 1){
-
-          MaxNight <- max(PARKsem[x ,PARK_SegmentVars])
-                              
-
-              if(is.na(MaxNight) == FALSE &
-                 as.integer(MaxNight) == 0) {
-                   
-                Bads$overnight_3[x] <- 1
-              }
-          }
-      }
+#Chris, I think the above line of code can replace the following code for overnight_3
+      # for (x in 1:length(PARKsem$ID)){
+      #     if(is.na(PARKsem$overnight[x]) == FALSE &
+      #        as.integer(PARKsem$overnight[x]) == 1){
+      # 
+      #     MaxNight <- max(PARKsem[x ,PARK_SegmentVars])
+      #                         
+      # 
+      #         if(is.na(MaxNight) == FALSE &
+      #            as.integer(MaxNight) == 0) {
+      #              
+      #           Bads$overnight_3[x] <- 1
+      #         }
+      #     }
+      # }
 
 
 # hoursPark:
