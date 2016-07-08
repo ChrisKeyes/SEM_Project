@@ -3,7 +3,7 @@ local,1,NA,Check for NA (i.e. blank)
 zip,3,"NULL, string length < 5 , non-numeric","Factor variable, check for NULL, incomplete zipcode, country name"
 entries,2,"NA,  ReEnter == 0",
 DKentries,1,99,DKReEnter == 99 & a_ReEnter = NA
-overnight,3,"NA, conditional NA, conditional nights check"," overnight_1 ==1 {overnight == NA}, overnight_2 == 1 { overnight == NA & (hoursPark != NA or daysPark != NA), we can justify assigning overnight value }, overnight_3 == 1  { overnight == 1  & nights*== 0 }"
+overnight,3,"NA, conditional NA, conditional nights check"," overnight_1 ==1 {overnight == NA}, overnight_2 == 1 { overnight == NA & nights* >0, we can justify assigning overnight value }, overnight_3 == 1  { overnight == 1  & nights*== 0 }"
 nightsBackcountry,1,conditional NA,Check for NA if overnight ==1
 nightsCampIn,1,conditional NA,Check for NA if overnight ==1
 nightsCampOut,1,conditional NA,Check for NA if overnight ==1
