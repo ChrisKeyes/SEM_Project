@@ -80,5 +80,5 @@ write.csv(GROUPvars, paste(getwd(),
                           row.names = FALSE)
 
 
-rm(list=setdiff(ls(), c("SEMvars","CHECKvars", "GROUPvars", "DataNameVector")))
+#rm(list=setdiff(ls(), c("SEMvars","CHECKvars", "GROUPvars", "DataNameVector")))
 
