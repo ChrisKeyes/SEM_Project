@@ -17,9 +17,11 @@ PARK <- "TEST"
           #         FullTripToAreaVars <- c(Trip2AreaVars, SegmentVars)
           
                   
-                  FullTripToAreaVars <- c("ID","hoursPark", "daysPark","overnight","nightsCampIn",
-                        "nightsCampOut","nightsLodgeIn","nightsLodgeOut","nightsCruise",
-                        "nightsOther","tripPurpose","equallyNearby","primaryNearby")
+                  # FullTripToAreaVars <- c("ID","hoursPark", "daysPark","overnight","nightsCampIn",
+                  #       "nightsCampOut","nightsLodgeIn","nightsLodgeOut","nightsCruise",
+                  #       "nightsOther","tripPurpose","equallyNearby","primaryNearby")
+FullTripToAreaVars <- GROUPvars[as.numeric(GROUPvars$TripToArea)!=1,"TripToArea"]
+
 TripToAreaVars <- NULL
 for (y in FullTripToAreaVars){
   if (exists(y, where = PARKsem) == TRUE){
