@@ -65,3 +65,4 @@ childrenCovered,ChildrenCovered,Q34b_ChildrenCovered,Q29a_ExpCoverC,Q24b_Childre
 numCovered,,,Q29a_ExpCoverTotal,Q24_TotalPeople
 numSplit,SplitExpenses,Q34c_SplitExpenses,Q29b_ExpSplit,Q24c_SplitExpenses
 zip,a_Zip,Q36a_Zip,Q30_Zip_Y,Q25a_Zip
+weight,,NewWeight,,
