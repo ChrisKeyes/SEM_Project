@@ -3,11 +3,12 @@
 # Use the script 1_Upload... to get the data
 setwd("~/SEM_Project")
 
-source("1_Load&Subset.R")
+          # source("1_Load&Subset.R")
 
 # Clear the environment except for the data we want
       # NOTE: we could make a vector of park names to clean up the list below (colnames in SEMvars would work)
-rm(list=setdiff(ls(), c("CUVAsem","ACADsem", "YOSEsem", "PARKsem", "TESTdata")))  # NOTE: once script is finalized, delete this line 
+          
+          # rm(list=setdiff(ls(), c("CUVAsem","ACADsem", "YOSEsem", "PARKsem", "TESTdata")))  # NOTE: once script is finalized, delete this line 
 
 # Will use "PARKsem" as general name for the dataset
 
@@ -31,11 +32,11 @@ for (v in PARKvars){
   MM <-   grep( v, CHECKvars$SEMvars, ignore.case = TRUE, value = FALSE)
   Matches <- append(Matches, MM)
 }
-  rm(MM, v) #Remove extraneous variables
-
+  
 # Drop the variables from CHECKvars that do not match those in PARKsem
 CHECKvars <- data.frame(CHECKvars[Matches,])
 
+rm(MM, v, Matches) #Remove extraneous variables
 # Create Data frame for matrix of bads.
 # First, create a data frame named Bads using the "ID" variable from PARKsem
 
@@ -84,15 +85,15 @@ check <- PARKsem[as.numeric(PARKsem$zip) == 1 ,"ID"]
       Bads$zip_1[c(check)] <- 1
         
         
-# a_Zip_2; Identify Countries;    FOR CUVA 301:306 -- WILL NEED TO AUTOMATE OR SPECIFY THESE VALUES FOR EACH PARK
-check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
-                   as.numeric(PARKsem$zip) == 302 | 
-                   as.numeric(PARKsem$zip) == 303 |
-                   as.numeric(PARKsem$zip) == 304 |
-                   as.numeric(PARKsem$zip) == 305 |
-                   as.numeric(PARKsem$zip) == 306 ,"ID"]    # "|" is the "or" syntax
-
-      Bads$zip_2[c(check)] <- 1
+# # a_Zip_2; Identify Countries;    FOR CUVA 301:306 -- WILL NEED TO AUTOMATE OR SPECIFY THESE VALUES FOR EACH PARK
+# check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
+#                    as.numeric(PARKsem$zip) == 302 | 
+#                    as.numeric(PARKsem$zip) == 303 |
+#                    as.numeric(PARKsem$zip) == 304 |
+#                    as.numeric(PARKsem$zip) == 305 |
+#                    as.numeric(PARKsem$zip) == 306 ,"ID"]    # "|" is the "or" syntax
+# 
+#       Bads$zip_2[c(check)] <- 1
 
 # zip_3: Identify incomplete zip codes  #####still working on this
 # IncompleteZip <- NULL      
@@ -164,10 +165,10 @@ for (y in ExpVars){
       
 # Create vector of group type variables
       # NOTE: The vector below is CASE SENSITIVE
-GroupVars <- c("adultsCovered", "childrenCovered")
+PartyVars <- c("adultsCovered", "childrenCovered")
 
-# Loop over elements of GroupVars and if they are present in PARKsem check for NULL observations     
-for (y in GroupVars){
+# Loop over elements of PartyVars and if they are present in PARKsem check for NULL observations     
+for (y in PartyVars){
   if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
         
     check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
@@ -219,7 +220,9 @@ check <- PARKsem[is.na(PARKsem$overnight) ,"ID"]
       Bads$overnight_1[c(check)] <- 1
 
 # overnight_2:
-# Check to identify observations with overnight==NA, but with positive sum of overnight stays in the lodging sectors
+# Check to identify observations with overnight==NA, but with positive sum of overnight stays
+# in the lodging sectors (e.g. sum(nights*) >= 1)
+      
 PARK_SegmentVars <- NULL
 
 for (y in SegmentVars){
@@ -231,6 +234,7 @@ for (y in SegmentVars){
 
 PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
 Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem["nightsLocalArea"]>0] <- 1
+
 #dfverify <- PARKsem[c("ID",PARK_SegmentVars,"nightsLocalArea","overnight")]
 
       # check <- PARKsem[is.na(PARKsem$overnight) &
@@ -241,9 +245,9 @@ Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem["nightsLocalArea"]>0] 
       
 # overnight_3:
 # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
+
 Bads["overnight_3"][PARKsem["overnight"]==1 & PARKsem["nightsLocalArea"]==0] <- 1      
 
-#Chris, I think the above line of code can replace the following code for overnight_3
       # for (x in 1:length(PARKsem$ID)){
       #     if(is.na(PARKsem$overnight[x]) == FALSE &
       #        as.integer(PARKsem$overnight[x]) == 1){
@@ -336,13 +340,11 @@ Bads$Sum <- rowSums(Bads[,c(which(colnames(Bads) != c("ID")))])
 check <- Bads[is.na(Bads$Sum) ,"ID"]    
     Bads$Sum[c(check)] <- as.numeric(0)
 
-# Store Bads data frame as PARKbads
-PARKbads <- Bads 
-
-# CUVAbads <- PARKbads  #NOTE: modify this line for park of interest
-
-# Remove Bads dataframe
-rm(Bads, v, y, check)
+          # # Store Bads data frame as PARKbads
+          # PARKbads <- Bads 
+          # 
+          # # Remove Bads dataframe
+rm(check, v, y)
   
   
 

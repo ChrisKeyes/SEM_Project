@@ -34,15 +34,15 @@ Parklist <- list.files()
 DataNameVector <- c(NULL)  #to be used within the loop
 
 for (x in Parklist) {
-    ParkName <- substr(x, 1, 4)
-        ParkName <- paste(ParkName, "data", sep = "")
-    DataNameVector <- append(DataNameVector, ParkName)
+    PARKname <- substr(x, 1, 4)
+        PARKname <- paste(PARKname, "data", sep = "")
+    DataNameVector <- append(DataNameVector, PARKname)
     
         WD <- getwd()
         filename <- paste(WD, x,sep = "/")
     
     park <- read.csv(filename)
-    getParkName(ParkName)
+    getParkName(PARKname)
         park <- NULL
 }
 
@@ -55,7 +55,7 @@ DataNameVector  #If we loop, can use this vector of park names
 #column 1: desired variables
 #column 2: search terms to find matches within survey data
 SEMVars <- read.csv("~/SEM_Project/SEMvars.csv")
-  SEMVars
+  head(SEMVars)
   
 ################################################################################################
 # Use the two lines below to specify which park to subset and rename columns
@@ -79,12 +79,13 @@ for (r in MATCHvars){
   
 colnames(PARKsem) <- SEMVars$SEMvars[c(colIndex)]
   
-# Use the line below to name the data frame to the specific park  
-CUVAsem <- PARKsem
+# # Use the line below to name the data frame to the specific park  
+# CUVAsem <- PARKsem
   
 # End of script - Move to cleaning script
 setwd("~/SEM_Project")
 
+rm(colIndex,i,park, r, WD, x)
 
 ################################################################################################
 ############# SAVE CODE BELOW AND USE PARK SPECIFIC VARIABLE SELECTION SCRIPT ABOVE ############
