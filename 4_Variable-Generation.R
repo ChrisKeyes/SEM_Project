@@ -3,18 +3,20 @@
 
 # Use the preceeding scripts to get the data
 setwd("~/SEM_Project")
+library(plyr)
+
+source("1_Load&Subset.R")
+
+PARKsem <- TESTdata
 
 source("2_Cleaning.R")
-    # NOTE: "2_Cleaning.R" runs and is written such that:
-              # PARKbads <- TESTbads
-              # PARKsem  <- TESTsem
-              #     Run the code below to change to different park
 
 
-# Set data frames to park of interest 
-        # PARKbads <- CUVAbads
-        # PARKsem <- CUVAsem
 
+PARKbads <- Bads
+      rm(Bads)
+      rm(CUVAdata,GATEdata,YOSEdata)  # Remove all extra data and keep TESTdata
+      
 ###########################################################################################
 #***************** SEGMENT VARIABLE CREATION & ANALYSIS ***********************************
 
@@ -43,28 +45,96 @@ source("2_Cleaning.R")
 # Create PARKsegments data frame from PARKsem data (copy of PARKsem data) 
 PARKsegments <- PARKsem
 
-# Create a vector of "ID"'s which cannot be identified as local | nonlocal
-BADlocal_1 <- PARKbads[PARKbads$local_1 == 1 , "ID"]  
+# For observations where overnight == NA, but sum(nights*)>=1, change overnight <- 1 
+PARKsegments$overnight <- ifelse(PARKbads$overnight_2 == 1, 1, PARKsegments$overnight)
+      # **** CHECK TO VERIFY THIS WORKS CORRECTLY **** 
 
-# Create a vector of "ID"'s which do not identify day | overnight trip
-BADovernight_1 <- PARKbads[PARKbads$overnight_1 == 1 , "ID"]
+# For observations where local==NA, but zip is provided, change local to 
+# local == 1 if zip matches local zipcodes or
+# local == 0 if zip matches non-local zipcodes
 
-# Create a vewctor of "ID"'s which have incomplete accommodation data
-      # NOTE: maybe run this code later?  If respondent identified themselves as day/overnight, 
-      # we could still use them for share day vs. overnight share?
 
-BADovernight_3 <- PARKbads[PARKbads$overnight_3 == 1, "ID"]
+PARK_localzip <- subset(PARKsem, local == 1, select = zip)
 
-# Compile the list of "ID"'s into a vector (union of the three vectors)
-IDdrop <- as.factor(union(BADlocal_1, BADovernight_1))
+PARK_nonlocalzip <- subset(PARKsem, local == 0, select = zip)
+
     
-    IDdrop <- as.factor(union(IDdrop, BADovernight_3))  # NOTE: union() can only be applied between 2 vectors 
-                                                        # at a time
-# Drop the observations from PARKsegments 
-PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
+    PARK_localzip <-  count(PARK_localzip)
+        colnames(PARK_localzip) <- c("LOCAL_ZIP", "FREQUENCY")
+            n <- sum(PARK_localzip$FREQUENCY)
+            
+        LocalZip <- PARK_localzip[PARK_localzip$FREQUENCY/n > .08, "LOCAL_ZIP"]   
+                # CHANGE WEIGHT AFTER TESTING 
 
-      # NOTE: the match() function ensures that we are selecting observations by their unique ID value
-      #       rather than their row/column index
+    PARK_nonlocalzip <-  count(PARK_nonlocalzip)
+        colnames(PARK_nonlocalzip) <- c("NON-LOCAL_ZIP", "FREQUENCY")
+            m <- sum(PARK_nonlocalzip$FREQUENCY)
+        
+        nonLocalZip <- PARK_nonlocalzip[PARK_nonlocalzip$FREQUENCY/m > .08, "NON-LOCAL_ZIP"]    
+      
+    ErrorZip <- intersect(LocalZip, nonLocalZip) 
+          # The any zip values that are in the intersections must be errors
+    
+        PARK_localzip <- LocalZip[which(LocalZip != ErrorZip)]
+        PARK_nonlocalzip <- nonLocalZip[which(nonLocalZip != ErrorZip)]
+
+for (zips in PARK_localzip){
+  PARKsegments[which(PARKsegments$zip == zips & is.na(PARKsegments$local)), "local"] <- 1
+}
+  
+for (zips in PARK_nonlocalzip){
+  PARKsegments[which(PARKsegments$zip == zips & is.na(PARKsegments$local)), "local"] <- 0
+}
+        
+         # CHECK TO VERIFY THIS CODE IS WORKING
+
+# Now re-run script 2 to produce a second BADS matrix which reflects the corrected data frame
+PARKsem_COPY <- PARKsem
+
+# Create a copy of original PARKsem for temporary use
+PARKsem <- PARKsegments
+    
+# NOTE: AT THIS POINT, WE COULD SAVE PARKsem TO THE OUTPUT FOLDER AND CLEAN THE DATA FRAME
+# IN MEMORY USING THE SAME NAME 
+
+    source("2_Cleaning.R")
+        PARKbads_cleaned <- Bads
+        PARKsegments <- PARKsem
+            rm(Bads)
+            
+# PARKsegments$sumBADS <- PARKbads$local_1 + PARKbads$overnight_1 + PARKbads$overnight_3
+PARKsegments$sumBADS <- PARKbads_cleaned$local_1 + PARKbads_cleaned$overnight_1 + PARKbads_cleaned$overnight_3
+    
+# Create a vector of :"ID"'s which will be dropped, then subset the data by dropping bad observations
+DropIDs <- PARKsegments[PARKsegments$sumBADS >=1, "ID"]
+
+PARKsegments <- subset(PARKsegments, sumBADS == 0 , select = c(colnames(PARKsegments)))
+
+
+              # # Create a vector of "ID"'s which cannot be identified as local | nonlocal
+              # BADlocal_1 <- PARKbads[PARKbads$local_1 == 1 , "ID"]  
+              # 
+              # # Create a vector of "ID"'s which do not identify day | overnight trip
+              # BADovernight_1 <- PARKbads[PARKbads$overnight_1 == 1 , "ID"]
+              # 
+              # # Create a vewctor of "ID"'s which have incomplete accommodation data
+              #       # NOTE: maybe run this code later?  If respondent identified themselves as day/overnight, 
+              #       # we could still use them for share day vs. overnight share?
+              # 
+              # BADovernight_3 <- PARKbads[PARKbads$overnight_3 == 1, "ID"]
+              # 
+              # # Compile the list of "ID"'s into a vector (union of the three vectors)
+              # IDdrop <- as.factor(union(BADlocal_1, BADovernight_1))
+              #     
+              #     IDdrop <- as.factor(union(IDdrop, BADovernight_3))  # NOTE: union() can only be applied between 2 vectors 
+              #  
+              # PARKsegments <- subset(PARKsegments, sumBADS == 0 , select = colnames(PARKsegments))    
+              #                                                        # at a time
+              # # Drop the observations from PARKsegments 
+              # PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
+
+              # NOTE: the match() function ensures that we are selecting observations by their unique ID value
+              #       rather than their row/column index
 
 # Reset the row numbers to a complete sequence from 1:n
 row.names(PARKsegments) <- NULL   

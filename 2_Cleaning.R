@@ -12,7 +12,7 @@ setwd("~/SEM_Project")
 
 # Will use "PARKsem" as general name for the dataset
 
-PARKsem <- TESTdata    #Use this line to work with "TESTdata" and block out the line below
+# PARKsem <- TESTdata    #Use this line to work with "TESTdata" and block out the line below
 # PARKsem <- CUVAsem
 
 # NOTE: "TESTdata" is already cleaned and renamed (e.g. subsetted version of PARKsem dataset)
@@ -84,7 +84,9 @@ levels(PARKsem$zip)
 check <- PARKsem[as.numeric(PARKsem$zip) == 1 ,"ID"]
       Bads$zip_1[c(check)] <- 1
         
-        
+
+# I THINK WE SHOULD CONSIDER CHECKING ZIP WHEN WE CREATE PARKDATA.CSV; TOO MUCH VARIATION 
+      
 # # a_Zip_2; Identify Countries;    FOR CUVA 301:306 -- WILL NEED TO AUTOMATE OR SPECIFY THESE VALUES FOR EACH PARK
 # check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
 #                    as.numeric(PARKsem$zip) == 302 | 
@@ -232,9 +234,14 @@ for (y in SegmentVars){
   }
 }
 
-PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
-Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem["nightsLocalArea"]>0] <- 1
+# NOTE: I am going to modify this script to only modify the column "overnight_2", rather than 
+# add a column "nightslocalarea" (avoiding adding any columns to PARKsem prior to script 4)
 
+          PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
+          Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem["nightsLocalArea"]>0] <- 1
+          
+          # Bads["overnight_2test"][is.na(PARKsem["overnight"]) & nightsLocalArea>0] <- 1
+          
 #dfverify <- PARKsem[c("ID",PARK_SegmentVars,"nightsLocalArea","overnight")]
 
       # check <- PARKsem[is.na(PARKsem$overnight) &
