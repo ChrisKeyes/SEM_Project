@@ -80,13 +80,18 @@ levels(PARKsem$zip)
         # 1 = " " (Null or blank entries)
         # 301:306 = All countries and non-zip codes
         
-# zip_1; Identify NULL (blank zip codes)      ****NOTE: CUVA DID NOT HAVE "NA" FOR NULL, BUT ACTUAL " " (BLANKS)
-check <- PARKsem[as.numeric(PARKsem$zip) == 1 ,"ID"]
+# zip_1; Identify NULL (blank zip codes)     **** CHANGE THIS TO IS.NA CHECK **** 
+check <- PARKsem[is.na(PARKsem$zip),"ID"]
       Bads$zip_1[c(check)] <- 1
         
 
 # I THINK WE SHOULD CONSIDER CHECKING ZIP WHEN WE CREATE PARKDATA.CSV; TOO MUCH VARIATION 
-      
+      # NOTE: YOSE and GATE also had the same "blanks" as CUVA
+
+# zip_2: Identify blank zip codes (e.g. zip == " ", rather than zip == NA)     
+check <- PARKsem[which(PARKsem$zip == " "), "ID"]
+      Bads$zip_2[c(check)] <- 1   
+            
 # # a_Zip_2; Identify Countries;    FOR CUVA 301:306 -- WILL NEED TO AUTOMATE OR SPECIFY THESE VALUES FOR EACH PARK
 # check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
 #                    as.numeric(PARKsem$zip) == 302 | 
@@ -212,7 +217,16 @@ SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
         }
       }
 
-
+      PARK_SegmentVars <- NULL
+      
+      for (y in SegmentVars){
+        if (exists(y, where = PARKsem) == TRUE){
+          
+          PARK_SegmentVars <- append(PARK_SegmentVars, y)
+        }
+      }
+      
+      
 # overnight:
 # overnight_1: 
 # Check to see if respondant refused to answer overnight (or if RSG did not fill in).  
@@ -221,26 +235,27 @@ check <- PARKsem[is.na(PARKsem$overnight) ,"ID"]
 
       Bads$overnight_1[c(check)] <- 1
 
+# overnight_4:  Identify observations where overnight == NA, and at least one of the accomodation
+# types is NA 
+      # These observations will be fixed or dropped
+
+PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars])
+
+Bads["overnight_4"][is.na(PARKsem["overnight"]) & 
+                     is.na(PARKsem$nightsLocalArea)] <- 1
+
+
 # overnight_2:
 # Check to identify observations with overnight==NA, but with positive sum of overnight stays
 # in the lodging sectors (e.g. sum(nights*) >= 1)
       
-PARK_SegmentVars <- NULL
-
-for (y in SegmentVars){
-  if (exists(y, where = PARKsem) == TRUE){
-    
-    PARK_SegmentVars <- append(PARK_SegmentVars, y)
-  }
-}
 
 # NOTE: I am going to modify this script to only modify the column "overnight_2", rather than 
 # add a column "nightslocalarea" (avoiding adding any columns to PARKsem prior to script 4)
 
           PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
-          Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem["nightsLocalArea"]>0] <- 1
-          
-          # Bads["overnight_2test"][is.na(PARKsem["overnight"]) & nightsLocalArea>0] <- 1
+
+          Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem$nightsLocalArea >0] <- 1
           
 #dfverify <- PARKsem[c("ID",PARK_SegmentVars,"nightsLocalArea","overnight")]
 
@@ -254,6 +269,8 @@ for (y in SegmentVars){
 # Check to verify that for overnight==1, at least one "nights*" variable is >= 1 
 
 Bads["overnight_3"][PARKsem["overnight"]==1 & PARKsem["nightsLocalArea"]==0] <- 1      
+
+PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
 
       # for (x in 1:length(PARKsem$ID)){
       #     if(is.na(PARKsem$overnight[x]) == FALSE &
