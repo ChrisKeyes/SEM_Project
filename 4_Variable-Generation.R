@@ -50,37 +50,42 @@ source("2_Cleaning.R")
       PARKbads <- Bads
       
 rm(Bads)
-    rm(CUVAdata,GATEdata,YOSEdata)  # Remove all extra data and keep TESTdata
+    rm(CUVAdata,GATEdata,YOSEdata, PARKdata)  # Remove all extra data and keep TESTdata
       
 ###########################################################################################
 #***************** SEGMENT VARIABLE CREATION & ANALYSIS ***********************************
 
 # Before modifying/subsetting the data further, create a copy of the original PARKsem data frame
-PARKsem_COPY <- PARKsem
+    # NOTE: AT THIS POINT, WE COULD SAVE PARKsem TO THE OUTPUT FOLDER AND CLEAN THE DATA FRAME
+    # IN MEMORY USING THE SAME NAME 
+PARKsem_raw <- PARKsem
 
 # Create PARKsegments data frame from PARKsem data (copy of PARKsem data) 
 PARKsegments <- PARKsem
       # WANT TO DELETE THIS LINE AND CONTINUE WORKING WITH PARKSEM, CREATE PARK SEGMENTS LATER
 
 # For observations where overnight == NA, but sum(nights*)>=1, change overnight <- 1 
-    IDs_ON2 <- PARKbads[which(PARKbads$overnight_2 == 1), "ID"]   # save for testing/verification
+  # (i.e. PARKbads$overnight_2 == 1)
+    IDs_ON2 <- PARKbads[which(PARKbads$overnight_2 == 1), "ID"]   
 
-PARKsegments$overnight <- ifelse(PARKbads$overnight_2 == 1, 1, PARKsegments$overnight)
-      # **** CHECK TO VERIFY THIS WORKS CORRECTLY **** 
-
-# For observations where zip == " " (i.e. zip is blank, PARKbads$zip_2 == 1), replace with zip == NA
-    IDs_ZIP2 <- PARKbads[which(PARKbads$zip_2 == 1), "ID"]
+        PARKsegments$overnight[IDs_ON2] <- 1
     
-    PARKsegments$zip[c(IDs_ZIP2)] <- NA
-
-# For observations where overnight == 1, but one or more of the accomodation types is NA
-# (e.g. PARK_SegmentVars == NA), replace with zero
-for (y in PARK_SegmentVars){
-  v <- paste(y, "1", sep = "_")
-    IDs_badNights <- PARKbads[PARKbads[v]==1, "ID"]
-      PARKsegments[match(IDs_badNights, PARKsegments$ID), y] <- 0
+# For observations where overnight == 1, but one or more of the accomodation 
+# types is NA, replace with zero
+        
+for (VAR in PARK_SegmentVars){
+          
+    IDs_SEG <- na.omit(PARKsegments[with(PARKsegments, overnight == 1 & is.na(PARKsegments[VAR])), "ID"])
+        
+        PARKsegments[match(IDs_SEG, PARKsegments$ID), VAR ] <- 0
 }
-
+        
+# For observations where zip == " " (i.e. zip is blank, PARKbads$zip_2 == 1), replace with zip == NA
+# (i.e. PARKbads$zip_2 == 1)
+    IDs_ZIP2 <- PARKbads[which(PARKbads$zip_2 == 1), "ID"]
+        
+        PARKsegments$zip[c(IDs_ZIP2)] <- NA
+        
 # For observations where local==NA, but zip is provided, change local to 
 # local == 1 if zip matches local zipcodes or
 # local == 0 if zip matches non-local zipcodes
@@ -90,7 +95,7 @@ PARK_localzip <- subset(PARKsegments, local == 1 & is.na(zip)==FALSE , select = 
 
 PARK_nonlocalzip <- subset(PARKsegments, local == 0 & is.na(zip)==FALSE , select = zip)
 
-IDs_local1 <- PARKbads[which(PARKbads$local_1 == 1), "ID"]  
+IDs_local1 <- PARKbads[which(PARKbads$local_1 == 1), "ID"]
           
           # save for testing/verification
           # IDs_local1 are observations where local == NA
@@ -112,17 +117,13 @@ IDs_local1 <- PARKbads[which(PARKbads$local_1 == 1), "ID"]
       
     ErrorZip <- intersect(LocalZip, nonLocalZip) 
           ErrorZip <- append(ErrorZip, c("DK"))  # we can add other values as needed
+                # CHANGE WEIGHT AFTER TESTING 
           
-          # The any zip values that are in the intersections must be errors
-    
-        # PARK_localzip <- LocalZip[which(LocalZip != ErrorZip)]
-        # PARK_nonlocalzip <- nonLocalZip[which(nonLocalZip != ErrorZip)]
                 # NOTE: setdiff is the difference of set x net set y, not the union of 
                 # x & y net the intersection
           
         PARK_localzip <- setdiff(LocalZip, ErrorZip)
         PARK_nonlocalzip <- setdiff(nonLocalZip, ErrorZip)
-        
         
 for (zips in PARK_localzip){
   PARKsegments[which(PARKsegments$zip == zips & is.na(PARKsegments$local)), "local"] <- 1
@@ -135,71 +136,38 @@ for (zips in PARK_nonlocalzip){
          # CHECK TO VERIFY THIS CODE IS WORKING
 
 # Now re-run script 2 to produce a second BADS matrix which reflects the corrected data frame
-PARKsem_COPY <- PARKsem
 
-# Create a copy of original PARKsem for temporary use
-PARKsem <- PARKsegments
+PARKsem <- PARKsegments   # This is temporary solution due to name overlap
     
-        # NOTE: AT THIS POINT, WE COULD SAVE PARKsem TO THE OUTPUT FOLDER AND CLEAN THE DATA FRAME
-        # IN MEMORY USING THE SAME NAME 
-
     source("2_Cleaning.R")
-        PARKbads_cleaned <- Bads
-        PARKsegments <- PARKsem
-            rm(Bads)
-            
-# PARKsegments$sumBADS <- PARKbads$local_1 + PARKbads$overnight_1 + PARKbads$overnight_3
-            #  local_1: local == NA
-            # overnight_1: overnight == NA
-            # overnight_3: 
 
-            PARKsegments$sumBADS <- PARKbads_cleaned$local_1 +
-                        PARKbads_cleaned$overnight_1 +
-                        PARKbads_cleaned$overnight_3
+        PARKbads_seg <- Bads
+        PARKsegments <- PARKsem # This is temporary solution due to name overlap
+            rm(Bads, PARKsem)
+            
+# Create a column "sumBADS" which is the sum of the three checks which capture
+# which observations could not be cleaned/completed and will be dropped
+            # local_1: local == NA
+            # overnight_1: overnight == NA
+            # overnight_3: overnight == 1 & nightsLocalArea == 0
+
+PARKsegments$sumBADS <- PARKbads_seg$local_1 +
+                        PARKbads_seg$overnight_1  +
+                        PARKbads_seg$overnight_3
     
 # Create a vector of :"ID"'s which will be dropped, then subset the data by dropping bad observations
 DropIDs <- PARKsegments[PARKsegments$sumBADS >=1, "ID"]
 
 PARKsegments <- subset(PARKsegments, sumBADS == 0 , select = c(colnames(PARKsegments)))
 
-PARKbads_cleaned <- PARKbads_cleaned[-c(DropIDs),]
-
-              # # Create a vector of "ID"'s which cannot be identified as local | nonlocal
-              # BADlocal_1 <- PARKbads[PARKbads$local_1 == 1 , "ID"]  
-              # 
-              # # Create a vector of "ID"'s which do not identify day | overnight trip
-              # BADovernight_1 <- PARKbads[PARKbads$overnight_1 == 1 , "ID"]
-              # 
-              # # Create a vewctor of "ID"'s which have incomplete accommodation data
-              #       # NOTE: maybe run this code later?  If respondent identified themselves as day/overnight, 
-              #       # we could still use them for share day vs. overnight share?
-              # 
-              # BADovernight_3 <- PARKbads[PARKbads$overnight_3 == 1, "ID"]
-              # 
-              # # Compile the list of "ID"'s into a vector (union of the three vectors)
-              # IDdrop <- as.factor(union(BADlocal_1, BADovernight_1))
-              #     
-              #     IDdrop <- as.factor(union(IDdrop, BADovernight_3))  # NOTE: union() can only be applied between 2 vectors 
-              #  
-              # PARKsegments <- subset(PARKsegments, sumBADS == 0 , select = colnames(PARKsegments))    
-              #                                                        # at a time
-              # # Drop the observations from PARKsegments 
-              # PARKsegments <- PARKsegments[ -c(match(IDdrop, PARKsegments$ID)),]
-
-              # NOTE: the match() function ensures that we are selecting observations by their unique ID value
-              #       rather than their row/column index
-
-# Reset the row numbers to a complete sequence from 1:n
-          # NOTE: this may not be neccessary - factor variables maintain all associated charracteristics
-          # row.names(PARKsegments) <- NULL   
-          # row.names(PARKbads_cleaned) <- NULL
-
-# PARKsegments is now our subsetted data set (from PARKsem) that can be used for segment analysis
-      head(PARKsegments)  
+PARKbads_seg <- PARKbads_seg[-c(DropIDs),]
 
 # Clean up memory
-      rm(DropIDs, ErrorZip, LocalZip, m, MATCHvars, nonLocalZip, PARK_localzip, PARK_nonlocalzip,
-         zips)
+      rm(DropIDs, ErrorZip, LocalZip, m, MATCHvars, nonLocalZip, PARK_localzip,
+         PARK_nonlocalzip, VAR, zips,
+         IDs_local1, IDs_ZIP2, IDs_ON2, IDs_SEG)
+
+      
 ###########################################################################################
 #***************** Categorize Observations by Accomodation ********************************
 
@@ -242,13 +210,6 @@ PARKsegments$day_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments$overn
 PARKsegments$overnight_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 1, 1,0 )
 PARKsegments$overnight_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments$overnight == 1, 1 ,0)
 
-# PARKsegments$day_local[as.integer(PARKsegments$local)==1 &
-#                          as.numeric(PARKsegments$overnight)==0 ] <- 1
-# 
-# PARKsegments$overnight_local[as.integer(PARKsegments$local)==1 &
-#                                as.numeric(PARKsegments$overnight)==1 ] <- 1
-
-
 # Fill in zeros for overnights that only answered select accomodation categories (changing NA to zeros)
         # NOTE: The assumption being made here is that if the respondent identified themselves as overnight and 
         # identified at least one accomodation type for one or more nights, than any other accomodation types 
@@ -259,7 +220,7 @@ PARKsegments$overnight_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments
 # for (VAR in PARK_SegmentVars){
   # z <- paste(VAR, "1", sep = "_")
   # 
-  #     IDfix <- PARKbads_cleaned[PARKbads_cleaned[,z]==1, "ID"]
+  #     IDfix <- PARKbads_seg[PARKbads_seg[,z]==1, "ID"]
   #       # IDfix <- PARKbads[PARKbads[,z]==1, "ID"]
   # 
   #         PARKsegments[match(IDfix, PARKsegments$ID), VAR] <- 0
@@ -276,20 +237,22 @@ for (x in 1:length(PARKsegments$ID)){
 
           maxNightsType <- colnames(PARKsegments[c(x),PARK_SegmentVars])[max.col(PARKsegments[c(x),PARK_SegmentVars],
                                                                                 ties.method="first")]
-                # maxNightsType: vector specifying the type of accomodation with the largest number of nights provided
-                      # NOTE: maxNightsType = NA if any nights* category is NA
-          
-          # NOTE: ties.method = "first" returns the first value in the vector, problem when all accomodation 
-          # types are equal (most likely all zeros)
+          # maxNightsType: vector specifying the type of accomodation with the largest number of nights provided
+
+              # NOTE: ties.method = "first" returns the first value in the vector, problem when all accomodation 
+              # types are equal (most likely all zeros)
           
           maxNights <- max(PARKsegments[c(x), PARK_SegmentVars])
           minNights <- min(PARKsegments[c(x), PARK_SegmentVars])
                 # maxNights/minNights: vector specifying the largest/smallest integer value of nights given.
           
-          if (is.na(maxNightsType) | # overnight == NA should be removed already (error if this is true)
+          if (is.na(maxNightsType) | 
               as.character(maxNights) == 0 |
-              as.character(maxNights) == as.character(minNights)){ # collect "ID"'s for problematic observations 
+              as.character(maxNights) == as.character(minNights)){ 
                   IDs_badNights <- append(IDs_badNights, as.character(PARKsegments$ID[x])) 
+                  # IDs_badNights: vector of ID's which need to be addressed due to 
+                  # equal nights in multiple segment categories or missing data that 
+                  # was not caught by checks
           }
           
           else { # If the observation is clean, categorize it accordingly
@@ -301,13 +264,11 @@ for (x in 1:length(PARKsegments$ID)){
     }
 }
 
+if(length(IDs_badNights) > 0) stop(
+  "There are ID's which cannot be put into segments. Review IDs_badNights")
+# message <- function() warning("There are ID's which cannot be put into segments", call. = FALSE)
+# stop function() stopifnot(length(IDs_badNights) == 0)
 
-# PARKsegments <- PARKsegments[-c(match(IDs_badNights, PARKsegments$ID)),] # just drop these variables for the time being 
-    # row.names(PARKsegments) <- NULL   # Reset row names
-
-    
-# THIS IS WHERE SCRIPT 2 SHOULD BE RERUN AND THE BADS MATRIX GENERATED
-    
 ###########################################################################################
 #***************** Generate Segment Shares ************************************************
     
@@ -316,7 +277,6 @@ for (x in 1:length(PARKsegments$ID)){
     
 # Number of overnight & day observations (overall)
     n_overnight <- sum((PARKsegments[,"overnight"]==1)) 
-        # NOTE:  if you recieve "NA" rather than a number, the data is not suffieciently cleaned
     n_day <- sum((PARKsegments[,"overnight"] == 0))
 
 # Overnight and day shares

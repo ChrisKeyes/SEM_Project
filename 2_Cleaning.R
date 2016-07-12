@@ -74,52 +74,17 @@ check <- PARKsem[is.na(PARKsem$local),"ID"]
 # Factor variable with 306 levels
 # The "as.numeric" function forces the factors into numbers with range 1:number of levels
 # For zip, as.numeric identifies each a_Zip as a number 1:306; "levels()" lists levels
-levels(PARKsem$zip)   
+# levels(PARKsem$zip)   
 
-# Examining levels we have:
-        # 1 = " " (Null or blank entries)
-        # 301:306 = All countries and non-zip codes
-        
-# zip_1; Identify NULL (blank zip codes)     **** CHANGE THIS TO IS.NA CHECK **** 
+# zip_1; Identify NULL (blank zip codes)     
 check <- PARKsem[is.na(PARKsem$zip),"ID"]
       Bads$zip_1[c(check)] <- 1
         
-
-# I THINK WE SHOULD CONSIDER CHECKING ZIP WHEN WE CREATE PARKDATA.CSV; TOO MUCH VARIATION 
-      # NOTE: YOSE and GATE also had the same "blanks" as CUVA
 
 # zip_2: Identify blank zip codes (e.g. zip == " ", rather than zip == NA)     
 check <- PARKsem[which(PARKsem$zip == " "), "ID"]
       Bads$zip_2[c(check)] <- 1   
             
-# # a_Zip_2; Identify Countries;    FOR CUVA 301:306 -- WILL NEED TO AUTOMATE OR SPECIFY THESE VALUES FOR EACH PARK
-# check <- PARKsem[as.numeric(PARKsem$zip) == 301 |
-#                    as.numeric(PARKsem$zip) == 302 | 
-#                    as.numeric(PARKsem$zip) == 303 |
-#                    as.numeric(PARKsem$zip) == 304 |
-#                    as.numeric(PARKsem$zip) == 305 |
-#                    as.numeric(PARKsem$zip) == 306 ,"ID"]    # "|" is the "or" syntax
-# 
-#       Bads$zip_2[c(check)] <- 1
-
-# zip_3: Identify incomplete zip codes  #####still working on this
-# IncompleteZip <- NULL      
-# for (z in PARKsem$zip){
-#   
-#   if (PARKsem[is.na(as.numeric(PARKsem$zip[z])) == TRUE]){
-#     #do nothing
-#   }
-#   else if (PARKsem[as.numeric(PARKsem$zip) > 9999 &
-#                    as.numeric(PARKsem$zip) < 100000]){
-#     #do nothing
-#   }
-#   else {
-#     check <- PARKsem[as.numeric(PARKsem$zip)<=9999 |
-#                        as.numeric(PARKsem$zip)>99999, "ID"]  
-#     Bads$zip_3[c(check)] <- 1
-#     
-#   }
-# }    
 
 #***************************************************************************************************
 ####################### Check for NA's in expenditure categories ###################################
@@ -266,8 +231,6 @@ for (y in PartyVars){
                   Bads[match(check, PARKsem$ID), c(v) ] <- 1
         }
       
-      
-      
 # overnight:
 # overnight_1: 
 # Check to see if respondant refused to answer overnight (or if RSG did not fill in).  
@@ -276,15 +239,15 @@ check <- PARKsem[is.na(PARKsem$overnight) ,"ID"]
 
       Bads$overnight_1[c(check)] <- 1
 
-# overnight_4:  Identify observations where overnight == NA, and at least one of the accomodation
-# types is NA 
-      # These observations will be fixed or dropped
-
-PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars])
-
-Bads["overnight_4"][is.na(PARKsem["overnight"]) & 
-                     is.na(PARKsem$nightsLocalArea)] <- 1
-
+      # # overnight_4:  Identify observations where overnight == NA, and at least one of the accomodation
+      # # types is NA 
+      #       # These observations will be fixed or dropped
+      # 
+      # PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars])
+      # 
+      # Bads["overnight_4"][is.na(PARKsem["overnight"]) & 
+      #                      is.na(PARKsem$nightsLocalArea)] <- 1
+      # 
 
 # overnight_2:
 # Check to identify observations with overnight==NA, but with positive sum of overnight stays
@@ -294,7 +257,7 @@ Bads["overnight_4"][is.na(PARKsem["overnight"]) &
 # NOTE: I am going to modify this script to only modify the column "overnight_2", rather than 
 # add a column "nightslocalarea" (avoiding adding any columns to PARKsem prior to script 4)
 
-          PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
+PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm=TRUE)
 
           Bads["overnight_2"][is.na(PARKsem["overnight"]) & PARKsem$nightsLocalArea >0] <- 1
           
