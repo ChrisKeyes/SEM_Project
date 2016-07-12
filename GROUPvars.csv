@@ -5,7 +5,7 @@ nightsCampOut,expRentalCar,overnight
 nightsLodgeIn,expPubTrans,nightsCampIn
 nightsLodgeOut,expRestaurants,nightsCampOut
 nightsCruise,expSnacks,nightsLodgeIn
-,expGroceries,nightsLodgeOut
+nightsOther,expGroceries,nightsLodgeOut
 ,expHotels,nightsCruise
 ,expSpecLodge,nightsOther
 ,expcamp,tripPurpose

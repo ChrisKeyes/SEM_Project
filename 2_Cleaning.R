@@ -145,25 +145,33 @@ check <- PARKsem[which(PARKsem$zip == " "), "ID"]
       # NOTE: The vector below is CASE SENSITIVE
       # NOTE: need to add ALL possible exp* categories
       
-ExpVars <- c("expGas", "expRentalCar","expPubTrans", "expRestaurants", "expSnacks", 
-             "expGroceries", "expHotels", "expEqpRental", "expSpecLodge", "expcamp", "expRec", 
-             "expSouvenirs", "expGuides", "expRail", "expTours", "expOther",
-             "expAdditional")
+# ExpVars <- c("expGas", "expRentalCar","expPubTrans", "expRestaurants", "expSnacks", 
+#              "expGroceries", "expHotels", "expEqpRental", "expSpecLodge", "expcamp", "expRec", 
+#              "expSouvenirs", "expGuides", "expRail", "expTours", "expOther",
+#              "expAdditional")
 
 # Loop through the variables in ExpVars
 # If the given expenditure variable exists within PARKsem, and has a check to be performed
 # check for NA's within that column.
 # Save the ID which corresponds to the NA and for that ID number, save a "1" in the Bads data frame
 # under the column named "ExpVars_1" (where ExpVars is the current variable name in the loop)
-for (y in ExpVars){
-  if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
-    
-    check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
-    
-    v = paste(y , "1", sep = "_")
-    Bads[c(check), c(v)] <- 1
-  }
-}
+
+# for (y in ExpVars){
+#   if (exists(y, where = PARKsem) == TRUE & any(grepl(paste("^", y, sep =""), colnames(Bads))) == TRUE){
+#     
+#     check <- PARKsem[is.na(PARKsem[c(y)]),"ID"]
+#     
+#     v = paste(y , "1", sep = "_")
+#     Bads[c(check), c(v)] <- 1
+#   }
+# }
+
+for (VAR in PARK_ExpVars){
+      check <- PARKsem[is.na(PARKsem[c(VAR)]),"ID"]
+          v <- paste(VAR , "1", sep = "_")
+                  Bads[c(check), c(v)] <- 1
+        }
+      
       
 #***************************************************************************************************
 ####################### Check for group type and expenditures vars #################################
@@ -198,33 +206,66 @@ for (y in PartyVars){
     # NOTE: The vector below is CASE SENSITIVE
     # NOTE: add ALL possible segment categories
       
-SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
-                 "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
-
-# Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations when 
-# overnight == 1. This check will identify overnight segment variables which are incomplete, but can be 
-# filled in with zeros.
+# SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
+#                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
+# 
+# # Loop over elements of SegmentVars and if they are present in PARKsem check for NULL observations when 
+# # overnight == 1. This check will identify overnight segment variables which are incomplete, but can be 
+# # filled in with zeros.
+#       
+# 
+#       for (y in SegmentVars){
+#         if (exists(y, where = PARKsem) == TRUE){
+#           
+#           check <- na.omit(PARKsem[with(PARKsem, overnight == 1 & is.na(PARKsem[y])), "ID"])
+#              
+#               v <- paste(y , "1", sep = "_")
+#           
+#               Bads[match(check, PARKsem$ID), c(v) ] <- 1
+#         }
+#       }
+# 
+#       for (y in SegmentVars){
+#         if (exists(y, where = PARKsem) == TRUE){
+#           
+#           check <- na.omit(PARKsem[with(PARKsem, is.na(overnight) & is.na(PARKsem[y])), "ID"])
+#           
+#           v <- paste(y , "1", sep = "_")
+#           
+#           Bads[match(check, PARKsem$ID), c(v) ] <- 1
+#         }
+#       }
+#       
+#       PARK_SegmentVars <- NULL
+      # 
+      # for (VAR in SegmentVars){
+      #   if (exists(VAR, where = PARKsem) == TRUE){
+      #     
+      #     PARK_SegmentVars <- append(PARK_SegmentVars, VAR)
+      #   }
+      # }
       
-
-      for (y in SegmentVars){
-        if (exists(y, where = PARKsem) == TRUE){
-          
-          check <- na.omit(PARKsem[with(PARKsem, overnight == 1 & is.na(PARKsem[y])), "ID"])
-             
-              v <- paste(y , "1", sep = "_")
-          
-              Bads[match(check, PARKsem$ID), c(v) ] <- 1
-        }
-      }
-
-      PARK_SegmentVars <- NULL
+# The check below is easy enough to correct using subset and ifelse.         
+      # for (VAR in PARK_SegmentVars){
+      #   
+      #     check <- na.omit(PARKsem[with(PARKsem, overnight == 1 & is.na(PARKsem[VAR])), "ID"])
+      #         
+      #         v <- paste(VAR , "1", sep = "_")
+      #     
+      #           Bads[match(check, PARKsem$ID), c(v) ] <- 1
+      #   }
       
-      for (y in SegmentVars){
-        if (exists(y, where = PARKsem) == TRUE){
+# For observations where overnight == NA, find segment variables which are also NA
+      
+      for (VAR in PARK_SegmentVars){
+
+          check <- na.omit(PARKsem[with(PARKsem, is.na(overnight) & is.na(PARKsem[VAR])), "ID"])
           
-          PARK_SegmentVars <- append(PARK_SegmentVars, y)
+              v <- paste(VAR , "1", sep = "_")
+          
+                  Bads[match(check, PARKsem$ID), c(v) ] <- 1
         }
-      }
+      
       
       
 # overnight:
@@ -270,7 +311,7 @@ Bads["overnight_4"][is.na(PARKsem["overnight"]) &
 
 Bads["overnight_3"][PARKsem["overnight"]==1 & PARKsem["nightsLocalArea"]==0] <- 1      
 
-PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
+# PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
 
       # for (x in 1:length(PARKsem$ID)){
       #     if(is.na(PARKsem$overnight[x]) == FALSE &

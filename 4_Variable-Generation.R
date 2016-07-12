@@ -1,6 +1,9 @@
 # This script will use the PARKbads matrix to generate 
 # variables for spending analysis.
 
+# Clear all data in memory
+rm(list=union(ls(), ls()))
+
 # Use the preceeding scripts to get the data
 setwd("~/SEM_Project")
 
@@ -9,40 +12,55 @@ library(plyr)
 source("1_Load&Subset.R")
 
       PARKsem <- TESTdata
+      
+# Upload the GROUPvars and create vectors of each variable category. Keep only those variables
+# that are specific to the current park.
+
+GROUPvars <- read.table("GROUPvars.csv", header = TRUE, sep = ",", na.strings = "")
+      
+  SEGMENTvars <- na.omit(GROUPvars$SEGMENTvars)
+  EXPvars <- na.omit(GROUPvars$EXPENDITUREvars)
+  TRIPvars <- na.omit(GROUPvars$TripToArea)
+  
+      PARK_SegmentVars <- NULL
+      PARK_ExpVars <- NULL
+      PARK_TripVars <- NULL
+      
+      for (VAR in SEGMENTvars){
+        if (exists(VAR, where = PARKsem) == TRUE){
+          PARK_SegmentVars <- append(PARK_SegmentVars, VAR)
+        }
+      }
+      
+      for (VAR in EXPvars){
+        if (exists(VAR, where = PARKsem) == TRUE){
+          PARK_ExpVars <- append(PARK_ExpVars, VAR)
+        }
+      }
+      
+      for (VAR in TRIPvars){
+        if (exists(VAR, where = PARKsem) == TRUE){
+          PARK_TripVars <- append(PARK_TripVars, VAR)
+        }
+      }
+      
 
 source("2_Cleaning.R")
 
-PARKbads <- Bads
-      rm(Bads)
-      rm(CUVAdata,GATEdata,YOSEdata)  # Remove all extra data and keep TESTdata
+      PARKbads <- Bads
+      
+rm(Bads)
+    rm(CUVAdata,GATEdata,YOSEdata)  # Remove all extra data and keep TESTdata
       
 ###########################################################################################
 #***************** SEGMENT VARIABLE CREATION & ANALYSIS ***********************************
 
-# The park specific data frame will be called "PARKsegments" and will be used for 
-# segment analysis
-
-# Subset data by droping observations are incomplete or unuseable. For segments, data points
-# must be identifiable as "local" | "nonlocal". Observations must also provide data neccessary
-# to categorize trip type. These categories are:
-      # daytrip
-      # lodgeIn
-      # lodgeOut
-      # campIn
-      # campOut
-      # other
-
-
-# local/nonlocal: 
-#     Must have answered "local" (e.g. PARKbads; local_1 == 0)
-# 
-# Trip type:
-#     Must have answered "overnight", and for overnight visitors, must have identified their 
-#     type of lodging for at least one night (e.g. PARKbads, overnight_1 == 0 & nights*_1 == 0)
-
+# Before modifying/subsetting the data further, create a copy of the original PARKsem data frame
+PARKsem_COPY <- PARKsem
 
 # Create PARKsegments data frame from PARKsem data (copy of PARKsem data) 
 PARKsegments <- PARKsem
+      # WANT TO DELETE THIS LINE AND CONTINUE WORKING WITH PARKSEM, CREATE PARK SEGMENTS LATER
 
 # For observations where overnight == NA, but sum(nights*)>=1, change overnight <- 1 
     IDs_ON2 <- PARKbads[which(PARKbads$overnight_2 == 1), "ID"]   # save for testing/verification
@@ -134,7 +152,8 @@ PARKsem <- PARKsegments
             #  local_1: local == NA
             # overnight_1: overnight == NA
             # overnight_3: 
-PARKsegments$sumBADS <- PARKbads_cleaned$local_1 +
+
+            PARKsegments$sumBADS <- PARKbads_cleaned$local_1 +
                         PARKbads_cleaned$overnight_1 +
                         PARKbads_cleaned$overnight_3
     
@@ -189,17 +208,22 @@ PARKbads_cleaned <- PARKbads_cleaned[-c(DropIDs),]
 
       # PARKsegments$day_local <- 0
 
-SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
-                 "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
+# SegmentVars <- c("nightsBackcountry", "nightsCampIn", "nightsCampOut",
+#                  "nightsLodgeIn", "nightsLodgeOut", "nightsCruise", "nightsOther")    
 
-PARK_SegmentVars <- NULL
+# PARK_SegmentVars <- NULL
 
-for (y in SegmentVars){
-  if (exists(y, where = PARKsegments) == TRUE){
+# for (y in SegmentVars){
+#   if (exists(y, where = PARKsegments) == TRUE){
     
-        PARK_SegmentVars <- append(PARK_SegmentVars, y)   # vector of segments specific to PARK for use later
+for (VAR in PARK_SegmentVars){
+  
+  # PARK_SegmentVars <- append(PARK_SegmentVars, y)   # vector of segments specific to PARK for use later
+  
+        v <- paste("ON", substring(VAR, 7), sep = "_")
+
       
-        v <- paste("ON", substring(y, 7), sep = "_")
+        # v <- paste("ON", substring(y, 7), sep = "_")
         
         # v <- paste(substring(y,7),
         #            "nonlocal", sep = "_")   # This code reads:
@@ -209,7 +233,7 @@ for (y in SegmentVars){
         PARKsegments[,v] <- 0   # for each SegmentVar that is present in the PARKsegments data, create a column
                                 # named "v" and fill it with zeros
   }
-}
+# }
 
 # Identify local day trip and local overnight observations
 PARKsegments$day_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 0, 1, 0)
@@ -232,16 +256,14 @@ PARKsegments$overnight_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments
 
 # THIS SHOULD BE MOVED TO RUN BEFORE SCRIPT 2 IS RUN AGAIN
 
-for (y in PARK_SegmentVars){
-  
-  z <- paste(y, "1", sep = "_")
-
-      # IDfix <- PARKbads_cleaned[PARKbads_cleaned[,z]==1, "ID"]
-        IDfix <- PARKbads[PARKbads[,z]==1, "ID"]
-  
-          PARKsegments[match(IDfix, PARKsegments$ID), y] <- 0
-
-}
+# for (VAR in PARK_SegmentVars){
+  # z <- paste(VAR, "1", sep = "_")
+  # 
+  #     IDfix <- PARKbads_cleaned[PARKbads_cleaned[,z]==1, "ID"]
+  #       # IDfix <- PARKbads[PARKbads[,z]==1, "ID"]
+  # 
+  #         PARKsegments[match(IDfix, PARKsegments$ID), VAR] <- 0
+# }   # FIX THIS NOT WORKING CORRECTLY
 
 # Categorize all nonlocal repondants by accomodation type. Create a vector of "ID"'s which are overnight 
 # but do not identify any type of accomodation type 
@@ -329,7 +351,7 @@ c <- NULL   # c: vector of observations by segment
     }
 
                     a <- append(c("Overall", "Overnight", "Day", "Day_Local", "Day_NonLocal",
-                                  "Overnight_Local", "Overnight_nonLocal"), a)
+                                  "ON_Local", "ON_nonLocal"), a)
                     
                     b <- append(c(1,ON_share, DAY_share, DAYlocal_share, DAYnonlocal_share,
                                   ONlocal_share, ONnonlocal_share), b)
