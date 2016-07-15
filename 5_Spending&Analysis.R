@@ -84,6 +84,7 @@ PARKspending_MEANS$EXPENDITURES <- EXProw
 PARKspending_MEANS[,"Totals_byEXP"] <- 
   rowSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])
 
+View(PARKspending_MEANS)
 
 rm(df, tempdf, a, avg, b, c, EXProw, expV, IDs_badNights, ltotal_row, m, maxNights, maxNightsType, minNights, n, v, VAR, x, y, z)
 
