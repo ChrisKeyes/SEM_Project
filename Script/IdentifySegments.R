@@ -67,3 +67,74 @@ for (x in 1:length(PARKsegments$ID)){
 
 if(length(IDs_badNights) > 0) stop(
   "There are ID's which cannot be put into segments. Review IDs_badNights")
+
+
+###########################################################################################
+# SAVE THE SCRIPT BELOW FOR REFERENCE
+# # Add columns to PARKsegments to classify each observation
+# # Each column is initially a vector of zeros
+
+# for (VAR in PARK_SegmentVars){
+#   
+#         v <- paste("ON", substring(VAR, 7), sep = "_")
+# 
+#         PARKsegments[,v] <- 0   # for each SegmentVar that is present in the PARKsegments data, create a column
+#                                 # named "v" and fill it with zeros
+#   }
+# 
+# # Identify local day trip and local overnight observations
+# PARKsegments$day_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 0, 1, 0)
+# PARKsegments$day_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments$overnight == 0, 1,0)
+# 
+# PARKsegments$overnight_local <- ifelse(PARKsegments$local == 1 & PARKsegments$overnight == 1, 1,0 )
+# PARKsegments$overnight_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments$overnight == 1, 1 ,0)
+# 
+# # Fill in zeros for overnights that only answered select accomodation categories (changing NA to zeros)
+#         # NOTE: The assumption being made here is that if the respondent identified themselves as overnight and 
+#         # identified at least one accomodation type for one or more nights, than any other accomodation types 
+#         # unanswered should be zero (replace NA with zero)
+# 
+# 
+# # Categorize all nonlocal repondants by accomodation type. Create a vector of "ID"'s which are overnight 
+# # but do not identify any type of accomodation type 
+# 
+# IDs_badNights <- as.character(NULL) # Will capture "ID"s with incomplete data
+# 
+# for (x in 1:length(PARKsegments$ID)){
+#   if (as.integer(PARKsegments$overnight[x]) == 1){  # Confine loop to only overnight
+#     
+# 
+#           maxNightsType <- colnames(PARKsegments[c(x),PARK_SegmentVars])[max.col(PARKsegments[c(x),PARK_SegmentVars],
+#                                                                                 ties.method="first")]
+#           # maxNightsType: vector specifying the type of accomodation with the largest number of nights provided
+# 
+#               # NOTE: ties.method = "first" returns the first value in the vector, problem when all accomodation 
+#               # types are equal (most likely all zeros)
+#           
+#           maxNights <- max(PARKsegments[c(x), PARK_SegmentVars])
+#           minNights <- min(PARKsegments[c(x), PARK_SegmentVars])
+#                 # maxNights/minNights: vector specifying the largest/smallest integer value of nights given.
+#           
+#           if (is.na(maxNightsType) | 
+#               as.character(maxNights) == 0 |
+#               as.character(maxNights) == as.character(minNights)){ 
+#                   IDs_badNights <- append(IDs_badNights, as.character(PARKsegments$ID[x])) 
+#                   # IDs_badNights: vector of ID's which need to be addressed due to 
+#                   # equal nights in multiple segment categories or missing data that 
+#                   # was not caught by checks
+#           }
+#           
+#           else { # If the observation is clean, categorize it accordingly
+#               # v <- paste(substring(maxNightsType, 7), "nonlocal", sep = "_")
+#                 v <- paste("ON", substring(maxNightsType, 7), sep = "_")
+#                   
+#                 PARKsegments[x,v] <- 1
+#         }
+#     }
+# }
+# 
+# if(length(IDs_badNights) > 0) stop(
+#   "There are ID's which cannot be put into segments. Review IDs_badNights")
+
+
+
