@@ -99,6 +99,7 @@ DropIDs <- PARKsegments[PARKsegments$sumBADS >=1, "ID"]
 
 PARKsegments <- subset(PARKsegments, sumBADS == 0 , select = c(colnames(PARKsegments)))
 
+# CHRIS: figure out why there are a few bad observations not being dropped (overnight == NA, local == NA)
 PARKbads_seg <- PARKbads_seg[-c(DropIDs),]
 
 # Clean up memory
