@@ -55,13 +55,14 @@ for (x in SEGvars_on){
             b <- NULL
 }
 
+# REMOVE "expLocalTotal" FROM TABLE AND REPLACE WITH ACTUAL SUM OF MEANS
 # Move local expenditure total row to bottom of table
 if(exists("expLocalTotal", where = PARKsegments) == TRUE){
   
   ltotal_row <- match("expLocalTotal", 
                       PARKspending_MEANS$EXPENDITURES)
         
-        PARKspending_MEANS <- rbind(PARKspending_MEANS, PARKspending_MEANS[c(ltotal_row),])
+        # PARKspending_MEANS <- rbind(PARKspending_MEANS, PARKspending_MEANS[c(ltotal_row),])
   
         PARKspending_MEANS <- PARKspending_MEANS[-c(ltotal_row),]
 
@@ -81,8 +82,15 @@ PARKspending_MEANS$EXPENDITURES <- EXProw
     PARKspending_MEANS[m, 2:length(colnames(PARKspending_MEANS))] <- 
       colSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])    
 
-PARKspending_MEANS[,"Totals_byEXP"] <- 
-  rowSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])
+PARKspending_MEANS[,"Mean_EXP"] <- 0
+
+# Change row names to "EXPENDITURES" in PARKspending_MEANS
+# Change row names to "SEGMENT" in PARKshares_table
+# Create a vector of weights which matches the two (in order) and generate 
+# weighted spending means by segment share.
+
+
+  # rowSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])
 
 View(PARKspending_MEANS)
 

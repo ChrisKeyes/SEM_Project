@@ -5,6 +5,8 @@ source("~/SEM_Project/Script/getParkName.R")
 source("~/SEM_Project/Script/getSEMvars.R")
 
 library(plyr)
+library(svDialogs)
+
 
 SEMvars <- read.csv("~/SEM_Project/SEMvars.csv", header = TRUE)
 GROUPvars <- read.csv("~/SEM_Project/GROUPvars.csv", header = TRUE)
@@ -12,9 +14,21 @@ GROUPvars <- read.csv("~/SEM_Project/GROUPvars.csv", header = TRUE)
 setwd("~/SEM_Project/Data")
 
 Parklist <- list.files()
+
+    # res <- dlgList(substr(Parklist, 1, 4), 
+    #                multiple = TRUE, 
+    #                title = "Select Park(s)")$res
+    # 
+    # if (!length(res)) {
+    #   cat("You cancelled the choice\n")
+    # } else {
+    #   cat("You selected:\n")
+    #   print(res)
+    # }
+    
 DataNameVector <- c(NULL)
 
-
+# for (dataset in res){
 for (dataset in Parklist){
   DATA <- dataset 
   
