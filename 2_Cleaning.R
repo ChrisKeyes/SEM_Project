@@ -12,7 +12,7 @@ setwd("~/SEM_Project")
 
 # Will use "PARKsem" as general name for the dataset
 
- PARKsem <- TESTdata    #Use this line to work with "TESTdata" and block out the line below
+# PARKsem <- TESTdata    #Use this line to work with "TESTdata" and block out the line below
 # PARKsem <- CUVAsem
 
 # NOTE: "TESTdata" is already cleaned and renamed (e.g. subsetted version of PARKsem dataset)

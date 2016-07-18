@@ -76,7 +76,7 @@ source("~/SEM_Project/Script/clean_Local-Zip.R")
 
 # Now re-run script 2 to produce a second BADS matrix which reflects the corrected data frame
 
-PARKsem <- PARKsegments   # This is temporary solution due to name overlap
+PARKsem = PARKsegments   # This is temporary solution due to name overlap
     
     source("2_Cleaning.R")
 
