@@ -162,39 +162,42 @@ source("~/SEM_Project/PracticeFiles/Script5-TEST.R")
 ###########################################################################################
 #***************** Generate Re-Entry Means ************************************************
  
-# # source("~/SEM_Project/Script/GenReEntry.R")
-# if (exists("entries", where = PARKsegments) == TRUE &
-#     exists("DKentries", where = PARKsegments)== TRUE){ 
-#   
-# tempDF <- data.frame(PARKsegments)
-#     tempDF$sumBADSentries <- PARKbads_seg$entries_1 + PARKbads_seg$DKentries_1
-#           tempDF <- subset(tempDF,
-#                            sumBADSentries == 0 ,
-#                            select = 
-#                              c("entries", c(SEGvars_day, SEGvars_on)))
-#     
-#           colnames(tempDF) <- c("entries", SEGvars)
-#     
-#     b <- NULL # b: vector of mean entry by party segment
-#     for (VAR in SEGvars){
-#       b <- append(b, mean(tempDF["entries"][tempDF[VAR]==1]))
-#     }
-#     
-#     PARKentries_table <- data.frame(Mean_reEntry = b)
-#           row.names(PARKentries_table) = SEGvars  
-#     
-#           rm(tempDF, b, BADids, VAR )
-#           
-#           setwd("~/SEM_Project/Output")
-#           PARKfile <- paste(getwd(),
-#                             PARK, sep = "/")
-#           setwd(paste(getwd(),
-#                       PARK, sep = "/"))
-#           write.csv(PARKentries_table, paste(PARK, "_Mean_reEntry-PartyVisit.csv", sep = ""), row.names = TRUE)
-#     setwd("~/SEM_Project/Data")
-#           
-#     
-# }  
+# source("~/SEM_Project/Script/GenReEntry.R")
+if (exists("entries", where = PARKsegments) == TRUE &
+    exists("DKentries", where = PARKsegments)== TRUE){
+
+tempDF <- data.frame(PARKsegments)
+    tempDF$sumBADSentries <- PARKbads_seg$entries_1 + PARKbads_seg$DKentries_1
+          
+          tempDF <- subset(tempDF,
+                           sumBADSentries == 0 ,
+                           select =
+                             c("entries", c(SEGvars_day, SEGvars_on)))
+
+          colnames(tempDF) <- c("entries", SEGvars)
+
+    b <- NULL # b: vector of mean entry by party segment
+    for (VAR in SEGvars){
+      b <- append(b, mean(tempDF["entries"][tempDF[VAR]==1]))
+    }
+
+    PARKentries_table <- data.frame(Mean_reEntry = b)
+          row.names(PARKentries_table) <- SEGvars
+
+          rm(tempDF, b, BADids, VAR )
+
+          setwd("~/SEM_Project/Output")
+          
+          PARKfile <- paste(getwd(),
+                            PARK, sep = "/")
+          setwd(paste(getwd(),
+                      PARK, sep = "/"))
+          write.csv(PARKentries_table, paste(PARK, "_Mean_reEntry.csv", sep = ""), row.names = TRUE)
+    
+          setwd("~/SEM_Project/Data")
+
+
+}
 ###########################################################################################
 #***************** Store Output Tables and Data *******************************************
     

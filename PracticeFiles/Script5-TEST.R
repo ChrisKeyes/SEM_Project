@@ -77,6 +77,7 @@ PARKspending_MEANS[m, 2:length(colnames(PARKspending_MEANS))] <-
   colSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])    
 
 row.names(PARKspending_MEANS) <- PARKspending_MEANS$EXPENDITURES
+
 PARKspending_MEANS <- subset(PARKspending_MEANS, select = c(SEGvars_day,SEGvars_on))
 
 SEGvars <- c("Day_Local", "Day_NonLocal", SEGvars_on)

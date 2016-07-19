@@ -244,29 +244,35 @@ if (exists("hoursPark", where = PARKsem) == TRUE &
       
 #***************************************************************************************************
 ###################### Check the ReEnter question ##################################################
-# # entries_1: check for entries == NA & DKentries == NA
-# # These respondents refused to answer the question
-#       check <- PARKsem[is.na(PARKsem$entries) &
-#                          is.na(PARKsem$DKentries) ,"ID"]    
-#       
-#       Bads$entries_1[c(check)] <- 1
-#       
-# # entries_2: check for ReEnter >= 1 and DKReEnter == 99
-# # These respondents provided an estimate of entries, but also noted that they "did not know"
-#       check <- PARKsem[as.numeric(PARKsem$entries)>=1 &
-#                          as.integer(PARKsem$DKentries)==99 ,"ID"]
-#       check <- na.omit(check)
-#       
-#       Bads$entries_2[c(check)] <- 1
-#       
-#       
-# # DKentries_1: check if respondent only answered "Dont Know"
-#       check <- PARKsem[is.na(PARKsem$entries) &
-#                          as.integer(PARKsem$DKentries)==99 ,"ID"]    
-#       check <- na.omit(check)
-#       
-#       Bads$DKentries_1[c(check)] <- 1
-      
+# entries_1: check for entries == NA & DKentries == NA
+# These respondents refused to answer the question
+      if (exists("entries", where = PARKsem) == TRUE &
+          exists("DKentries", where = PARKsem)== TRUE){
+        
+      check <- PARKsem[is.na(PARKsem$entries) &
+                         is.na(PARKsem$DKentries) ,"ID"]
+
+      Bads$entries_1[c(check)] <- 1
+      }
+# entries_2: check for ReEnter >= 1 and DKReEnter == 99
+# These respondents provided an estimate of entries, but also noted that they "did not know"
+      # check <- PARKsem[as.numeric(PARKsem$entries)>=1 &
+      #                    as.integer(PARKsem$DKentries)==99 ,"ID"]
+      # check <- na.omit(check)
+      # 
+      # Bads$entries_2[c(check)] <- 1
+
+
+# DKentries_1: check if respondent only answered "Dont Know"
+      if (exists("entries", where = PARKsem) == TRUE &
+          exists("DKentries", where = PARKsem)== TRUE){
+        
+      check <- PARKsem[is.na(PARKsem$entries) &
+                         as.integer(PARKsem$DKentries)==99 ,"ID"]
+      check <- na.omit(check)
+
+      Bads$DKentries_1[c(check)] <- 1
+      }
 #***************************************************************************************************
 ##################### Other checks #################################################################
 
