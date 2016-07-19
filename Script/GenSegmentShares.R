@@ -70,6 +70,6 @@ PARKshares_table <- data.frame(SEGMENT = a, SHARE = b, OBSERVATIONS = c)
 rm(a, b, c, DAYnonlocal_share, DAYlocal_share, DAY_share, n, n_day, n_daylocal,
    n_daynonlocal, n_overnight, n_ONlocal, n_ONnonlocal, 
    ON_share, ONlocal_share, ONnonlocal_share, 
-   v, VAR, x, y, z)
+   v, x, y, z)
 
 
