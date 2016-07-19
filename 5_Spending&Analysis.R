@@ -16,7 +16,6 @@ PARKspending_MEANS <- data.frame(EXPENDITURES = PARK_ExpVars)
 SEGvars_on <- paste("ON", substring(PARK_SegmentVars, 7), sep = "_")            
 SEGvars_day <- c("day_local", "day_nonlocal")
 
-
 a <- NULL # colnames by segment
 b <- NULL # mean values by segment and expenditure
 
@@ -80,18 +79,24 @@ PARKspending_MEANS[m,] <- 0
 PARKspending_MEANS$EXPENDITURES <- EXProw
 
     PARKspending_MEANS[m, 2:length(colnames(PARKspending_MEANS))] <- 
-      colSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])    
-
-PARKspending_MEANS[,"Mean_EXP"] <- 0
-
+      colSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])  
+ 
 # Change row names to "EXPENDITURES" in PARKspending_MEANS
-# Change row names to "SEGMENT" in PARKshares_table
-# Create a vector of weights which matches the two (in order) and generate 
-# weighted spending means by segment share.
+row.names(PARKspending_MEANS) <- PARKspending_MEANS$EXPENDITURES
+      PARKspending_MEANS <- subset(PARKspending_MEANS, select = c(SEGvars_day,SEGvars_on))
 
+SEGvars <- c("Day_Local", "Day_NonLocal", SEGvars_on)
+      
+    colnames(PARKspending_MEANS) <- SEGvars
 
-  # rowSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])
+wghts <-PARKshares_table$SHARE[match(SEGvars, PARKshares_table$SEGMENT)]
 
+PARKspending_MEANS$MEAN_byEXP <- NA
+
+for (n in row.names(PARKspending_MEANS)){
+PARKspending_MEANS[n, "MEAN_byEXP"] <- sum(PARKspending_MEANS[n,] * wghts, na.rm = TRUE)
+}
+    
 View(PARKspending_MEANS)
 
 rm(df, tempdf, a, avg, b, c, EXProw, expV, IDs_badNights, ltotal_row, m, maxNights, maxNightsType, minNights, n, v, VAR, x, y, z)
