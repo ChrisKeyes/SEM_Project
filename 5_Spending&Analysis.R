@@ -99,5 +99,8 @@ PARKspending_MEANS[n, "MEAN_byEXP"] <- sum(PARKspending_MEANS[n,] * wghts, na.rm
     
 View(PARKspending_MEANS)
 
-rm(df, tempdf, a, avg, b, c, EXProw, expV, IDs_badNights, ltotal_row, m, maxNights, maxNightsType, minNights, n, v, VAR, x, y, z)
+rm(df, tempdf, 
+   a, avg, b, c, EXProw, expV, IDs_badNights, ltotal_row, m, 
+   maxNights, maxNightsType, minNights, n, v, VAR, 
+   wghts, x, y, z)
 
