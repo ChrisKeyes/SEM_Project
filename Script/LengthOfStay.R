@@ -24,8 +24,7 @@ df <- subset(df, df$bads == 0)
 #create a new variable daysParkAdj that estimates number of days in the park
 #Note: If a respondent answered both hours park and days park, then use days park (ignore hours park)
 #Round partial days up to nearest whole number
-df$hoursParkAdj <- ifelse(df$hoursPark >0,1,0)
-df$daysParkAdj <- ifelse(!is.na(df$daysPark),df$daysPark, df$hoursParkAdj)
+df$daysParkAdj <- ifelse(!is.na(df$daysPark),df$daysPark, 1)
 df$daysParkAdj <- ceiling(df$daysParkAdj)
 
 #create a new variable daysLocalArea equal to nightsLocalArea + 1
