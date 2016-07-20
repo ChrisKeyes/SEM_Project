@@ -13,7 +13,7 @@ PARKparty_MEANS <- data.frame(matrix(ncol = length(SEGS), nrow=0))
 colnames(PARKparty_MEANS)<-SEGS
 
 #subset the PARKsegments dataframe to only include columns needed for party size analysis
-VARS <- c("grpSize","adultsCovered","childrenCovered","numSplit", SEGS)
+VARS <- c("ID","grpSize","adultsCovered","childrenCovered","numSplit", SEGS)
 df <- subset(PARKsegments, select = VARS)
 
 #remove bad observations for party size analysis
