@@ -99,11 +99,10 @@ DropIDs <- PARKsegments[PARKsegments$sumBADS >=1, "ID"]
 
 PARKsegments <- subset(PARKsegments, sumBADS == 0 , select = c(colnames(PARKsegments)))
 
-# CHRIS: figure out why there are a few bad observations not being dropped (overnight == NA, local == NA)
 PARKbads_seg <- PARKbads_seg[-c(DropIDs),]
 
 # Clean up memory
-      rm(DropIDs, ErrorZip, LocalZip, m, MATCHvars, nonLocalZip, PARK_localzip,
+      rm(DropIDs, ErrorZip, LocalZip, m, nonLocalZip, PARK_localzip,
          PARK_nonlocalzip, VAR, zips,
          IDs_local1, IDs_ZIP2, IDs_ON2, IDs_SEG)
 
@@ -122,5 +121,6 @@ source("~/SEM_Project/Script/IdentifySegments.R")
 source("~/SEM_Project/Script/GenSegmentShares.R") 
 
 # View the shares table produced:
-     View(PARKshares_table)
+      
+     # View(PARKshares_table)
       

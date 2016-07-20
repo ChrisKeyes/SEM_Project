@@ -68,7 +68,7 @@ for (x in 1:length(PARKsegments$ID)){
 if(length(IDs_badNights) > 0) stop(
   "There are ID's which cannot be put into segments. Review IDs_badNights")
 
-
+rm(maxNights, maxNightsType, minNights, v, VAR, x)
 ###########################################################################################
 # SAVE THE SCRIPT BELOW FOR REFERENCE
 # # Add columns to PARKsegments to classify each observation

@@ -1,4 +1,7 @@
 # MATSTER TEST SCRIPT
+
+# install.packages("svDialogs")
+
 rm(list=union(ls(), ls()))
 
 source("~/SEM_Project/Script/getParkName.R")
@@ -30,6 +33,7 @@ DataNameVector <- c(NULL)
 
 # for (dataset in res){
 for (dataset in Parklist){
+  
   DATA <- dataset 
   
   if(DATA != "TESTdata.csv"){
@@ -39,15 +43,16 @@ for (dataset in Parklist){
             DataNameVector <- append(DataNameVector, PARKdata)
     
     
-    filename <- paste("~/SEM_Project/Data", DATA,sep = "/")
+    filename <- paste("~/SEM_Project/Data", DATA ,sep = "/")
     
     PARKdata <- read.csv(filename, header = TRUE)
-    PARKname <-  PARK  
+        PARKname <-  PARK  
     
 source("~/SEM_Project/PracticeFiles/Script1-TEST.R")
 
     source("~/SEM_Project/Script/getGroupVars.R")
-    
+    source("~/SEM_Project/Script/getEXPvars.R")
+        
           if( PARK == "YOSE"){
             PARKsem$local <- abs(PARKsem$local - 2)
           }
@@ -154,7 +159,45 @@ source("~/SEM_Project/Script/GenSegmentShares.R")
     
 source("~/SEM_Project/PracticeFiles/Script5-TEST.R")
  
+###########################################################################################
+#***************** Generate Re-Entry Means ************************************************
+ 
+# source("~/SEM_Project/Script/GenReEntry.R")
+if (exists("entries", where = PARKsegments) == TRUE &
+    exists("DKentries", where = PARKsegments)== TRUE){
+
+tempDF <- data.frame(PARKsegments)
+    tempDF$sumBADSentries <- PARKbads_seg$entries_1 + PARKbads_seg$DKentries_1
+          
+          tempDF <- subset(tempDF,
+                           sumBADSentries == 0 ,
+                           select =
+                             c("entries", c(SEGvars_day, SEGvars_on)))
+
+          colnames(tempDF) <- c("entries", SEGvars)
+
+    b <- NULL # b: vector of mean entry by party segment
+    for (VAR in SEGvars){
+      b <- append(b, mean(tempDF["entries"][tempDF[VAR]==1]))
+    }
+
+    PARKentries_table <- data.frame(Mean_reEntry = b)
+          row.names(PARKentries_table) <- SEGvars
+
+          rm(tempDF, b, BADids, VAR )
+
+          setwd("~/SEM_Project/Output")
+          
+          PARKfile <- paste(getwd(),
+                            PARK, sep = "/")
+          setwd(paste(getwd(),
+                      PARK, sep = "/"))
+          write.csv(PARKentries_table, paste(PARK, "_Mean_reEntry.csv", sep = ""), row.names = TRUE)
     
+          setwd("~/SEM_Project/Data")
+
+
+}
 ###########################################################################################
 #***************** Store Output Tables and Data *******************************************
     
@@ -169,7 +212,6 @@ source("~/SEM_Project/PracticeFiles/Script5-TEST.R")
     write.csv(PARKbads_seg, paste(PARK, "bads_seg.csv", sep = ""), row.names = FALSE)
     write.csv(PARKshares_table, paste(PARK, "shares_table.csv", sep = ""), row.names = FALSE)
     write.csv(PARKspending_MEANS, paste(PARK, "_MeanExpenditures-PartyType.csv", sep = ""), row.names = FALSE)
-    
   }
   
 }

@@ -58,11 +58,9 @@ if(exists("expLocalTotal", where = PARKsegments) == TRUE){
   ltotal_row <- match("expLocalTotal", 
                       PARKspending_MEANS$EXPENDITURES)
   
-  PARKspending_MEANS <- rbind(PARKspending_MEANS, PARKspending_MEANS[c(ltotal_row),])
-  
   PARKspending_MEANS <- PARKspending_MEANS[-c(ltotal_row),]
   
-  row.names(PARKspending_MEANS) <- NULL
+      row.names(PARKspending_MEANS) <- NULL
 }
 
 
@@ -78,8 +76,23 @@ PARKspending_MEANS$EXPENDITURES <- EXProw
 PARKspending_MEANS[m, 2:length(colnames(PARKspending_MEANS))] <- 
   colSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])    
 
-PARKspending_MEANS[,"Totals_byEXP"] <- 
-  rowSums(PARKspending_MEANS[,2:length(colnames(PARKspending_MEANS))])
+row.names(PARKspending_MEANS) <- PARKspending_MEANS$EXPENDITURES
 
-rm(df, tempdf, a, avg, b, c, EXProw, expV, IDs_badNights, ltotal_row, m, maxNights, maxNightsType, minNights, n, v, VAR, x, y, z)
+PARKspending_MEANS <- subset(PARKspending_MEANS, select = c(SEGvars_day,SEGvars_on))
+
+SEGvars <- c("Day_Local", "Day_NonLocal", SEGvars_on)
+
+colnames(PARKspending_MEANS) <- SEGvars
+
+wghts <-PARKshares_table$SHARE[match(SEGvars, PARKshares_table$SEGMENT)]
+
+PARKspending_MEANS$MEAN_byEXP <- NA
+
+for (n in row.names(PARKspending_MEANS)){
+  PARKspending_MEANS[n, "MEAN_byEXP"] <- sum(PARKspending_MEANS[n,] * wghts, na.rm = TRUE)
+}
+
+rm(df, 
+   a, avg, b, EXProw, expV, IDs_badNights, m, 
+   n, wghts, x, y)
 
