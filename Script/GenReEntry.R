@@ -13,7 +13,7 @@
 # Drop observations where 
         # PARKbads$entries_1 = 1
         # PARKbads$DKentries_1 = 1
-
+# Also drop observations where entries == 0  
 
 # Clear all data in memory
 rm(list=union(ls(), ls()))
@@ -29,7 +29,8 @@ tempDF <- data.frame(PARKsegments)
 tempDF$sumBADSentries <- PARKbads_seg$entries_1 + PARKbads_seg$DKentries_1
 
 tempDF <- subset(tempDF,
-                 sumBADSentries == 0 ,
+                 sumBADSentries == 0 &
+                   entries > 0,
                  select = 
                    c("entries", c(SEGvars_day, SEGvars_on)))
       
