@@ -14,7 +14,21 @@ source("~/SEM_Project/5_Spending&Analysis.R")
 # Test the difference in mean local total expenditure ("expLocalTotal")
 # across segment types
 
+PARK_ExpVars <- PARK_ExpVars[PARK_ExpVars !=c("expLocalTotal")] #Drop expLocalTotal
 SEGvars <- c(SEGvars_day, SEGvars_on)
+
+tempDF <- PARKsegments[,c(PARK_ExpVars, SEGvars_day, SEGvars_on, 
+                          c("nightsLocalArea", "tripPurpose", "equallyNearby", "primaryNearby"))]
+
+# Get exp totals
+tempDF$expTotal <- rowSums(PARKsegments[PARK_ExpVars])
+
+# Linear Regression 
+lm1 <- lm(expTotal~day_local + day_nonlocal + ON_CampIn +
+            ON_CampOut + ON_LodgeIn + ON_LodgeOut + ON_Other, 
+          data = tempDF)
+
+summary(lm1)
 
 
 MUtotal <-subset(PARKspending_MEANS, 
