@@ -1,6 +1,6 @@
 # Upload, rename, & subset script for SEM variables
 
-# This is the first set of script for the SEM project.  Run this script in its entirety to 
+# Run this script in its entirety to 
 # upload the datasets within the "data" folder.
 # Each data set will be stored in memory and renamed to its four letter park name (i.e. "ACAD").
 # The park data will then be subset into a new dataframe named "PARKsem" (i.e. "ACADsem") for cleaning.
