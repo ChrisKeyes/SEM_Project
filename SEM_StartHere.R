@@ -261,14 +261,93 @@ source("~/SEM_Project/Script/genReENTRY_means.R")
 
 source("~/SEM_Project/Script/genSPENDING_means.R") 
 
+###########################################################################################
+###########################################################################################
+# Store tables to PARK's "Output" folder
+
+# set the working directory as the folder to write csv to
+setwd(paste(paste("~/SEM_Project/Output", PARKname, sep = "/"), "Segments_Full", sep = "/"))
+
+# Write the PARKsem and PARKbads data frames to .csv
+write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_full.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_full.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_full.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_full.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_full.csv", sep = ""), row.names = TRUE) 
+
+# Set the working directory 
+setwd("~/SEM_Project")
+
+###########################################################################################
+###########################################################################################
+# To address the problem of small sample size in visitor segment categories, we will 
+# consolidate (a.k.a. "lump") together small segments.  The methodology of which segments
+# are lumped together is explained in the "getSEGMENTS_lumped.R" script.
+
+# NOTE: Since the output tables have been stored as .csv files, the data.frames and 
+# objects in memory will be overwritten using the lumped segments
+
+# The full set of segment variables is stored in memory as SEGvars. Rename the full set of
+# segment variables as SEGvars_FULL and generate a copy of these segments 
+# named "SEGvars_LUMPED".  
+SEGvars_FULL <- SEGvars
+SEGvars_LUMPED <- SEGvars
+
+# In the script "getSEGMENTS_lumped.R", the vector SEGvars_LUMPED will be subsetted and
+# appended to reflect the new lumped segments. 
+
+source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
+
+# To Re-Run the scripts which generate the shares and means tables, our lumped 
+# segment variables must be named "SEGvars" to match existing code. Save a copy of
+# SEGvars_LUMPED as SEGvars. Then re-run scripts.
+SEGvars <- SEGvars_LUMPED
 
 
+# *****************************************************************************************
+#***** Generate Segment Shares Table ******************************************************
+# *****************************************************************************************
 
+source("~/SEM_Project/Script/genSEGMENT_shares.R") 
 
+# *****************************************************************************************
+#***** Generate Length of Stay Means Table ************************************************
+# *****************************************************************************************
 
+source("~/SEM_Project/Script/genLENGTH_means.R") 
 
+# *****************************************************************************************
+#***** Generate Party Size Means Table ****************************************************
+# *****************************************************************************************
 
+source("~/SEM_Project/Script/genPARTY_means.R") 
 
+# *****************************************************************************************
+#***** Generate ReEntry Means Table *******************************************************
+# *****************************************************************************************
+
+source("~/SEM_Project/Script/genReENTRY_means.R") 
+
+# *****************************************************************************************
+#***** Generate Party Expenditure Means Table *********************************************
+# *****************************************************************************************
+
+source("~/SEM_Project/Script/genSPENDING_means.R") 
+
+###########################################################################################
+# Store tables to PARK's "Output/PARK/Segments_Lumped" folder
+# set the working directory as the folder to write csv to
+setwd(paste(paste("~/SEM_Project/Output/", PARKname, sep = "/"), "Segments_Lumped" , sep = "/"))
+
+# Write the PARKsem and PARKbads data frames to .csv
+write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_Lumped.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+
+# Set the working directory 
+setwd("~/SEM_Project")
 
 
 
