@@ -8,3 +8,7 @@ GATE_MeanExpenditures-PartyType.csv
 GATEbads_RAW.csv
 GATEbads_seg.csv
 GATEsem_RAW.csv
+GATElength_MEANS.csv
+GATEparty_MEANS.csv
+GATEsegment_SHARES.csv
+GATEspending_MEANS.csv
