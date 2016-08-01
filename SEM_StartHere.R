@@ -231,11 +231,18 @@ source("~/SEM_Project/Script/getSEGMENTS.R")
 # For explanation on how these scripts run and how the parameters and tables are 
 # generated, see the comments within the script being soucred.
 
+
 # *****************************************************************************************
 #***** Generate Segment Shares Table ******************************************************
 # *****************************************************************************************
 
 source("~/SEM_Project/Script/genSEGMENT_shares.R") 
+
+# *****************************************************************************************
+#***** Get Trip Purpose Scalers ***********************************************************
+# *****************************************************************************************
+
+source("~/SEM_Project/Script/getPRIMARYscalers.R")
 
 # *****************************************************************************************
 #***** Generate Length of Stay Means Table ************************************************
@@ -263,20 +270,8 @@ source("~/SEM_Project/Script/genSPENDING_means.R")
 
 ###########################################################################################
 ###########################################################################################
-# Store tables to PARK's "Output" folder
 
-# set the working directory as the folder to write csv to
-setwd(paste(paste("~/SEM_Project/Output", PARKname, sep = "/"), "Segments_Full", sep = "/"))
-
-# Write the PARKsem and PARKbads data frames to .csv
-write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_full.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_full.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_full.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_full.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_full.csv", sep = ""), row.names = TRUE) 
-
-# Set the working directory 
-setwd("~/SEM_Project")
+# source("~/SEM_Project/Script/writeTABLES.R")
 
 ###########################################################################################
 ###########################################################################################
@@ -335,19 +330,19 @@ source("~/SEM_Project/Script/genReENTRY_means.R")
 source("~/SEM_Project/Script/genSPENDING_means.R") 
 
 ###########################################################################################
-# Store tables to PARK's "Output/PARK/Segments_Lumped" folder
-# set the working directory as the folder to write csv to
-setwd(paste(paste("~/SEM_Project/Output/", PARKname, sep = "/"), "Segments_Lumped" , sep = "/"))
-
-# Write the PARKsem and PARKbads data frames to .csv
-write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_Lumped.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-
-# Set the working directory 
-setwd("~/SEM_Project")
+# # Store tables to PARK's "Output/PARK/Segments_Lumped" folder
+# # set the working directory as the folder to write csv to
+# setwd(paste(paste("~/SEM_Project/Output/", PARKname, sep = "/"), "Segments_Lumped" , sep = "/"))
+# 
+# # Write the PARKsem and PARKbads data frames to .csv
+# write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_Lumped.csv", sep = ""), row.names = TRUE) 
+# write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+# write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+# write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+# write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+# 
+# # Set the working directory 
+# setwd("~/SEM_Project")
 
 
 
