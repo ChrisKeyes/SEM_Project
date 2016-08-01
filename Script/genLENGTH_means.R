@@ -13,7 +13,7 @@ PARKlength_MEANS <- data.frame(matrix(ncol = length(SEGvars), nrow=0))
 # subset the PARKsegments dataframe to only include columns needed for length of 
 # stay analysis. Name the temporary data frame tempDF, and generate a vector
 # of variables to subset PARKsegments on named VARS
-VARS <- c("hoursPark","daysPark","nightsLocalArea", SEGvars)
+VARS <- c("hoursPark","daysPark","nightsLocalArea", "PRIMARYscalers", SEGvars)
 tempDF <- subset(PARKsegments, select = VARS)
 
 # Remove any observations from tempDF which do not meet criteria to be used for analysis
@@ -55,15 +55,22 @@ for (VAR in SEGvars){
   PARKlength_MEANS["daysLocalArea",VAR] <- round(mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]),2)
   PARKlength_MEANS["nightsLocalArea",VAR] <- round(mean(tempDF[
                                                     tempDF[,VAR]==1,"nightsLocalArea"]),2)
-#For lenghtVSE, use daysLocalArea for day trips and nightLocalArea for overnight trips
-ifelse(VAR == "day_local"|VAR == "day_nonlocal", 
-  PARKlength_MEANS["lengthVSE",VAR] <- 
-                round(mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]),2),
-  PARKlength_MEANS["lengthVSE",VAR] <- 
-                round(mean(tempDF[tempDF[,VAR]==1,"nightsLocalArea"]),2))
+  if(VAR == "day_local"){PARKlength_MEANS["DaysAttributable", VAR] <- 1}
+  else if (VAR == "day_nonlocal"){PARKlength_MEANS["DaysAttributable", VAR] <-
+                round(mean(tempDF[tempDF[,VAR]== 1, VAR]*tempDF[tempDF[,VAR]== 1, "PRIMARYscalers"]),2)}
+  else {PARKlength_MEANS["NightsAttributable", VAR] <- 
+                round(mean(tempDF[tempDF[,VAR]== 1, VAR]*tempDF[tempDF[,VAR]== 1, "PRIMARYscalers"]),2)}}
 
-  PARKlength_MEANS["percentDaysInPark",VAR] <- 
-                percent(mean(tempDF[tempDF[,VAR]==1,"daysParkAdj"])/
-                        mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]))
-}
+
+# #For lenghtVSE, use daysLocalArea for day trips and nightLocalArea for overnight trips
+# ifelse(VAR == "day_local"|VAR == "day_nonlocal", 
+#   PARKlength_MEANS["lengthVSE",VAR] <- 
+#                 round(mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]),2),
+#   PARKlength_MEANS["lengthVSE",VAR] <- 
+#                 round(mean(tempDF[tempDF[,VAR]==1,"nightsLocalArea"]),2))
+# 
+#   PARKlength_MEANS["percentDaysInPark",VAR] <- 
+#                 percent(mean(tempDF[tempDF[,VAR]==1,"daysParkAdj"])/
+#                         mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]))
+# }
 
