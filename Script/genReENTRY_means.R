@@ -17,6 +17,10 @@
 # Set working directory
 setwd("~/SEM_Project")
 
+# This script runs within the conditional statement that verifies "entries" variable is
+# present in the PARKsem data.frame
+if(exists("entries", where = PARKsem) == TRUE){ 
+
 # Generate a temporary data frame from PARKsegments named tempDF
 tempDF <- data.frame(PARKsegments)
 
@@ -28,10 +32,11 @@ tempDF$sumBADSentries <- PARKbads_seg$entries_1 + PARKbads_seg$DKentries_1
 # Subset tempDF by dropping observations where sumBADSentries is greater than zero
 tempDF <- subset(tempDF,
                  sumBADSentries == 0 & entries > 0,
-                 select = c("entries", c(SEGvars)))
+                 select = c("entries",  c(SEGvars)))
       
     colnames(tempDF) <- c("entries", SEGvars)
-      
+
+    
 # Generate a table named "PARKreEntry_MEANS" and find the mean re-entry rate by 
 # party per visit to local area. 
 PARKreEntry_MEANS <- data.frame(matrix(
@@ -45,6 +50,6 @@ PARKreEntry_MEANS <- data.frame(matrix(
 for (VAR in SEGvars){
   PARKreEntry_MEANS["n", VAR] <- sum(tempDF[,VAR])
   PARKreEntry_MEANS["Party_reEntry", VAR] <- 
-            round(mean(tempDF[tempDF[,VAR]==1,"entries"]),2)
-}
+            round(mean(tempDF[tempDF[,VAR]==1,"entries"]),2)}
 
+}

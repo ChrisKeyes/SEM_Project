@@ -73,6 +73,15 @@ source("~/SEM_Project/Script/getGROUPvars.R")
 tempDF <- PARKsem
 
 # *****************************************************************************************
+# entries
+
+# For observations where entries is greater than DaysinPark, set entries = DaysinPark. 
+# The assumption here is that the respondant misinterpreted the question or gave an 
+# answer which cannot be true. THese observations are identified in PARKbads_seg$entries_3
+BADentryID <- na.omit(tempDF[tempDF$entries > tempDF$daysPark, "ID"])
+
+PARKsem[PARKsem$ID == BADentryID, "entries"] <- PARKsem[PARKsem$ID == BADentryID, "daysPark"] 
+
 # overnight
 
 # For the "overnight" variable:
@@ -297,7 +306,7 @@ source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
 # segment variables must be named "SEGvars" to match existing code. Save a copy of
 # SEGvars_LUMPED as SEGvars. Then re-run scripts.
 SEGvars <- SEGvars_LUMPED
-
+SEGvars_on <- SEGvars_LUMPED[SEGvars_LUMPED!="day_local" & SEGvars_LUMPED!="day_nonlocal"]
 
 # *****************************************************************************************
 #***** Generate Segment Shares Table ******************************************************

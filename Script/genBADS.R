@@ -317,6 +317,12 @@ check <- PARKsem[as.numeric(PARKsem$entries)>=1 &
 
 Bads$entries_2[c(check)] <- 1
 
+# entries_3: check for observations where entries > daysPark
+# These respondants missunderstood the question or gave ficticios response
+Bads$entries_3 <- ifelse(is.na(PARKsem$daysPark)== FALSE &
+                         is.na(PARKsem$entries)== FALSE &
+                         PARKsem$entries > PARKsem$daysPark , 1, 0)
+                  
 
 # DKentries_1: check if respondent only answered "Dont Know"
 check <- PARKsem[is.na(PARKsem$entries) &
@@ -324,6 +330,7 @@ check <- PARKsem[is.na(PARKsem$entries) &
     check <- na.omit(check)
 
 Bads$DKentries_1[c(check)] <- 1
+
 
 }
 
