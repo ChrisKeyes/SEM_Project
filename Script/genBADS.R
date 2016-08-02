@@ -55,8 +55,9 @@ for (y in 1:length(CHECKvars$SEMvars)){
 ################## Location variable checks ########################################################
 # Local:
 # Local_1; check for NA
-check <- PARKsem[is.na(PARKsem$local),"ID"]
-    Bads$local_1[c(check)] <- 1
+        # check <- PARKsem[is.na(PARKsem$local),"ID"]
+        #     Bads$local_1[c(check)] <- 1
+Bads$local_1 <- ifelse(is.na(PARKsem$local)==TRUE, 1, 0)
 
 # zip:
 # Factor variable with 306 levels
@@ -258,6 +259,8 @@ Bads["overnight_3"][PARKsem["overnight"]==1 & PARKsem["nightsLocalArea"]==0] <- 
 # hoursPark_1:
 # Check for NULL observations in hoursPark, daysPark, and overnight. If all three variables are 
 # NULL, then must assume day trip (overnight == 0).
+if (exists("hoursPark", where = PARKsem)==TRUE){
+  
 check <- PARKsem[is.na(PARKsem$hoursPark) &
                         is.na(PARKsem$daysPark) &
                         is.na(PARKsem$overnight),"ID"]
@@ -282,18 +285,24 @@ check <- PARKsem[is.na(PARKsem$daysPark) &
 
 Bads$daysPark_1[c(check)] <- 1
 
+}
+
 # daysPark_2: Check for outliers (daysPark > 14)
 # NOTE: this was specific to CUVA, what sort of check should be use among all parks?
-check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
-      check <- na.omit(check)
-      
-Bads[match(check, PARKsem$ID), "daysPark_2"] <- 1
-      
+
+            # check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
+            #       check <- na.omit(check)
+            #       
+            # Bads[match(check, PARKsem$ID), "daysPark_2"] <- 1
+            #       
 
 #***************************************************************************************************
 ###################### Check the ReEnter question ##################################################
 # entries_1: check for entries == NA & DKentries == NA
 # These respondents refused to answer the question
+
+if (exists("entries", where = PARKsem) == TRUE){
+  
 check <- PARKsem[is.na(PARKsem$entries) &
                    is.na(PARKsem$DKentries) ,"ID"]    
 
@@ -308,6 +317,12 @@ check <- PARKsem[as.numeric(PARKsem$entries)>=1 &
 
 Bads$entries_2[c(check)] <- 1
 
+# entries_3: check for observations where entries > daysPark
+# These respondants missunderstood the question or gave ficticios response
+Bads$entries_3 <- ifelse(is.na(PARKsem$daysPark)== FALSE &
+                         is.na(PARKsem$entries)== FALSE &
+                         PARKsem$entries > PARKsem$daysPark , 1, 0)
+                  
 
 # DKentries_1: check if respondent only answered "Dont Know"
 check <- PARKsem[is.na(PARKsem$entries) &
@@ -316,6 +331,8 @@ check <- PARKsem[is.na(PARKsem$entries) &
 
 Bads$DKentries_1[c(check)] <- 1
 
+
+}
 
 #***************************************************************************************************
 ##################### Other checks #################################################################
