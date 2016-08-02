@@ -13,6 +13,11 @@
 # Set working directory
 setwd("~/SEM_Project")
 
+# The full set of segment variables is stored in memory as SEGvars. Rename the full set of
+# segment variables as SEGvars_FULL and generate a copy of these segments 
+# named "SEGvars_LUMPED".  
+SEGvars_FULL <- SEGvars
+SEGvars_LUMPED <- SEGvars
 
 # Identify which segments have <30 observations and store in vector named small_SEGMENTS
 #     NOTE: Only checking "overnight" segments for simplicity and under assumption that 

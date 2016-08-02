@@ -62,26 +62,6 @@ PARKsegments$fullPURPOSE[PARKsegments$tripPurpose == 3 &
                          is.na(PARKsegments$primaryNearby)] <- 4 
 
 
-
-
-# PARKsegments$fullPURPOSE[is.na(PARKsegments$tripPurpose) &
-#                          PARKsegments$equallyNearby == 0] <- 3 
-# 
-# PARKsegments$fullPURPOSE[is.na(PARKsegments$tripPurpose) &
-#                          PARKsegments$equallyNearby == 1] <- 2
-# 
-# PARKsegments$fullPURPOSE[is.na(PARKsegments$tripPurpose) &
-#                          is.na(PARKsegments$equallyNearby) &
-#                          PARKsegments$primaryNearby == 0] <- 4 
-# 
-# PARKsegments$fullPURPOSE[is.na(PARKsegments$tripPurpose) &
-#                          is.na(PARKsegments$equallyNearby) &
-#                          PARKsegments$primaryNearby == 1] <- 4 
-# 
-# PARKsegments$fullPURPOSE[is.na(PARKsegments$tripPurpose) &
-#                          is.na(PARKsegments$equallyNearby) &
-#                          is.na(PARKsegments$primaryNearby)] <- 0 # Need to sort all these out 
-
 # Attach a column of 1's to PARKsegments named PRIMARYscalers
 PARKsegments$PRIMARYscalers <- 1
 

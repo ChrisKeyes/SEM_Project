@@ -32,20 +32,20 @@ source("~/SEM_Project/Script/loadPACKAGES.R")
 # Set working directory
 setwd("~/SEM_Project")
 
-# Upload data sets from "Data" folder to memory.  Store each data set as "PARKdata" 
-source("~/SEM_Project/Script/getPARKdata.R")
-
 # Select which park to run analysis on and remove others from memory
 # #     NOTE: this option is currently restricted to selecting a single PARK
 
-# source("~/SEM_Project/Script/selectPARK.R")
+source("~/SEM_Project/Script/selectPARK.R")
       
-# *****************************************************************************************
-          PARKdata <-    CUVAdata 
-          PARKname <-  "CUVA"  
-              rm(CUVAdata,GATEdata,TESTdata,YOSEdata)
-          
-# *****************************************************************************************
+# # *****************************************************************************************
+# # Upload data sets from "Data" folder to memory.  Store each data set as "PARKdata" 
+# source("~/SEM_Project/Script/getPARKdata.R")
+# 
+#           PARKdata <-    CUVAdata 
+#           PARKname <-  "CUVA"  
+#               rm(CUVAdata,GATEdata,TESTdata,YOSEdata)
+#           
+# # *****************************************************************************************
           
 # Upload the "SEMvars.csv" to memory and store as a data.frame named SEMvars
 SEMvars <- read.csv("~/SEM_Project/SEMvars.csv")
@@ -164,15 +164,18 @@ rm(Bads)
 # Before modifying data, save data.frames as .csv to the corresponding folder 
 # (e.g. ~/SEM_Project/Output/PARK).
 
-# set the working directory as the folder to write csv to
-setwd(paste("~/SEM_Project/Output", PARKname, sep = "/"))
+# # *****************************************************************************************
+# # set the working directory as the folder to write csv to
+# setwd(paste("~/SEM_Project/Output", PARKname, sep = "/"))
+# 
+# # Write the PARKsem and PARKbads data frames to .csv
+# write.csv(PARKsem, paste(PARKname, "sem.csv", sep = ""), row.names = FALSE)
+# write.csv(PARKbads, paste(PARKname, "bads.csv", sep = ""), row.names = FALSE)
+# 
+# # Set the working directory
+# setwd("~/SEM_Project")
+# # *****************************************************************************************
 
-# Write the PARKsem and PARKbads data frames to .csv
-write.csv(PARKsem, paste(PARKname, "sem.csv", sep = ""), row.names = FALSE) 
-write.csv(PARKbads, paste(PARKname, "bads.csv", sep = ""), row.names = FALSE) 
-
-# Set the working directory 
-setwd("~/SEM_Project")
 
 # Create a copy of the original PARKsem data frame named "PARKsegments".  
 # The data.frame "PARKsem" should remain unchanged from this point forward (it has been 
@@ -210,7 +213,7 @@ PARKbads_seg <- subset(PARKbads, (local_1 + overnight_1 + overnight_3)==0)
 
 
 ###########################################################################################
-#***** SECTION IV: Identify Party Segments ************************************************
+#***** SECTION IV: Identify Party Segments, Shares, & Trip Purpose Scalers ****************
 
 # Using the data.frame PARKsegments, categorize each party (observation) by segment type.
 # The script below will generate a column in PARKsegments for each segment type. Each
@@ -232,15 +235,6 @@ SEGvars <- c(SEGvars_day,SEGvars_on)
 
 source("~/SEM_Project/Script/getSEGMENTS.R")
 
-      
-###########################################################################################
-#***** SECTION V: Generate Parameters for SEM *********************************************
-
-# The script below will generate the neccessary parameters by sourcing additional scripts.
-# For explanation on how these scripts run and how the parameters and tables are 
-# generated, see the comments within the script being soucred.
-
-
 # *****************************************************************************************
 #***** Generate Segment Shares Table ******************************************************
 # *****************************************************************************************
@@ -253,32 +247,45 @@ source("~/SEM_Project/Script/genSEGMENT_shares.R")
 
 source("~/SEM_Project/Script/getPRIMARYscalers.R")
 
-# *****************************************************************************************
-#***** Generate Length of Stay Means Table ************************************************
-# *****************************************************************************************
-
-source("~/SEM_Project/Script/genLENGTH_means.R") 
-
-# *****************************************************************************************
-#***** Generate Party Size Means Table ****************************************************
-# *****************************************************************************************
-
-source("~/SEM_Project/Script/genPARTY_means.R") 
-
-# *****************************************************************************************
-#***** Generate ReEntry Means Table *******************************************************
-# *****************************************************************************************
-
-source("~/SEM_Project/Script/genReENTRY_means.R") 
-
-# *****************************************************************************************
-#***** Generate Party Expenditure Means Table *********************************************
-# *****************************************************************************************
-
-source("~/SEM_Project/Script/genSPENDING_means.R") 
+# At this point, if the sample sizes per segment are sufficient, then continue with the 
+# script below. However, if one or more of the sample sizes per segment is not sufficiently
+# large (generally n<30 observations is considered a "small" sample), skip to run the
+# "getSEGMENTS_LUMPED.R" script.
 
 ###########################################################################################
-###########################################################################################
+#***** SECTION V: Generate Parameters for SEM *********************************************
+
+# The script below will generate the neccessary parameters by sourcing additional scripts.
+# For explanation on how these scripts run and how the parameters and tables are 
+# generated, see the comments within the script being soucred.
+
+
+# # *****************************************************************************************
+# #***** Generate Length of Stay Means Table ************************************************
+# # *****************************************************************************************
+# 
+# source("~/SEM_Project/Script/genLENGTH_means.R") 
+# 
+# # *****************************************************************************************
+# #***** Generate Party Size Means Table ****************************************************
+# # *****************************************************************************************
+# 
+# source("~/SEM_Project/Script/genPARTY_means.R") 
+# 
+# # *****************************************************************************************
+# #***** Generate ReEntry Means Table *******************************************************
+# # *****************************************************************************************
+# 
+# source("~/SEM_Project/Script/genReENTRY_means.R") 
+# 
+# # *****************************************************************************************
+# #***** Generate Party Expenditure Means Table *********************************************
+# # *****************************************************************************************
+# 
+# source("~/SEM_Project/Script/genSPENDING_means.R") 
+# 
+# ###########################################################################################
+# ###########################################################################################
 
 # source("~/SEM_Project/Script/writeTABLES.R")
 
@@ -291,20 +298,23 @@ source("~/SEM_Project/Script/genSPENDING_means.R")
 # NOTE: Since the output tables have been stored as .csv files, the data.frames and 
 # objects in memory will be overwritten using the lumped segments
 
-# The full set of segment variables is stored in memory as SEGvars. Rename the full set of
-# segment variables as SEGvars_FULL and generate a copy of these segments 
-# named "SEGvars_LUMPED".  
-SEGvars_FULL <- SEGvars
-SEGvars_LUMPED <- SEGvars
-
 # In the script "getSEGMENTS_lumped.R", the vector SEGvars_LUMPED will be subsetted and
 # appended to reflect the new lumped segments. 
 
-source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
+# source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
 
 # To Re-Run the scripts which generate the shares and means tables, our lumped 
 # segment variables must be named "SEGvars" to match existing code. Save a copy of
 # SEGvars_LUMPED as SEGvars. Then re-run scripts.
+Choice <- dlgMessage(c("Do you want to 'lump' segments together?"), "yesno",
+               title = "Lump Segments")$res
+
+if (Choice == "no") {
+  cat("You cancelled the choice\n")
+} else {
+  source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
+}
+
 SEGvars <- SEGvars_LUMPED
 SEGvars_on <- SEGvars_LUMPED[SEGvars_LUMPED!="day_local" & SEGvars_LUMPED!="day_nonlocal"]
 
@@ -338,19 +348,19 @@ source("~/SEM_Project/Script/genReENTRY_means.R")
 
 source("~/SEM_Project/Script/genSPENDING_means.R") 
 
-###########################################################################################
+# ##########################################################################################
 # # Store tables to PARK's "Output/PARK/Segments_Lumped" folder
 # # set the working directory as the folder to write csv to
 # setwd(paste(paste("~/SEM_Project/Output/", PARKname, sep = "/"), "Segments_Lumped" , sep = "/"))
 # 
 # # Write the PARKsem and PARKbads data frames to .csv
-# write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_Lumped.csv", sep = ""), row.names = TRUE) 
-# write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-# write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-# write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
-# write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_Lumped.csv", sep = ""), row.names = TRUE) 
+# write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_Lumped.csv", sep = ""), row.names = TRUE)
+# write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
+# write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
+# write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
+# write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
 # 
-# # Set the working directory 
+# # Set the working directory
 # setwd("~/SEM_Project")
 
 

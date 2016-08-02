@@ -1,8 +1,17 @@
-# This script will generate the spending profiles by segment type. The spending profiles 
+# This script completes two tasks. 
+# 
+# First, generate the spending profiles by segment type. The spending profiles 
 # are the mean expenditures per party, by segment type. The mean values will be stored to
 # a data.frame named "PARKspending_MEANS".
+# 
+# Second, generate average expenditure per party per day and per party per night. For day
+# visitors, average expenditure is kept in party/day units.  For overnight visitors, average
+# expenditure is in party/nights units. In both cases, the average expenditure values are
+# adjusted to account for party/days or party/nights attributable to the park.  This 
+# adjustment is made in the "genLENGTH_means.R" script.
 
 ###########################################################################################
+#***** PART I: Generate Spending Profiles by Segment **************************************
 
 # Set working directory
 setwd("~/SEM_Project")
@@ -62,4 +71,43 @@ for (EXP in row.names(PARKspending_MEANS)){
 }
 
 ###########################################################################################
+#***** PART II: Generate Party/Day & Party/Nights Expenditure *****************************
+
+# Verify that length of stay means have been generated (e.g. "PARKlength_MEANS" data.frame)
+
+if(exists("PARKlength_MEANS", where = globalenv())==FALSE) stop(
+  "PARKlength_MEANS does not exist.  Run 'genLENGTH_means.R' before running this script")
+
+
+# Generate a data.frame named "PARKexpBYparty_MEANS". This will store the expenditure means. 
+# The columns will be the segment variables, and the rows will be the expenditures.
+PARKexpBYparty_MEANS <- data.frame(matrix(ncol = length(SEGvars), nrow = 0))
+                                
+colnames(PARKexpBYparty_MEANS) <- SEGvars
+
+# If PARKsegments has the variable "expLocalTotal", remove the values and generate them
+# manually. If the variable does not exist, create it.  "expLocalTotal" is the sum of 
+# all the expenditure variables relevant to the park (e.g. those in PARKexp_vars)
+PARKexp <- PARK_ExpVars[PARK_ExpVars != "expLocalTotal"]
+PARKsegments$expLocalTotal <- rowSums(PARKsegments[,c(PARKexp)])
+
+for(VAR in SEGvars){
+  PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR] <- round(mean(
+        PARKsegments[PARKsegments[,VAR]==1, "expLocalTotal"]), 2)
+  PARKexpBYparty_MEANS["Days_Attributable", VAR] <- round(PARKlength_MEANS["DaysAttributable", VAR], 2)
+  PARKexpBYparty_MEANS["Nights_Attributable", VAR] <- round(PARKlength_MEANS["NightsAttributable", VAR], 2)
+  
+  if (VAR == "day_local" | VAR == "day_nonlocal"){
+  PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
+      round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]*PARKexpBYparty_MEANS["Days_Attributable", VAR],2)}
+
+  else (PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
+    round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]/PARKexpBYparty_MEANS["Nights_Attributable", VAR],2))}
+
+
+
+
+
+
+
 
