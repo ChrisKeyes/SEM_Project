@@ -1,9 +1,9 @@
 SEGMENTvars,EXPENDITUREvars,TripToArea,nonNUMERICvars
 nightsBackcountry,expParkEntrance,hoursPark,DKexpAdditional
-nightsCampIn,expGas,daysPark,DKexpLocal
-nightsCampOut,expRentalCar,overnight,expOtherSpec
-nightsLodgeIn,expPubTrans,nightsCampIn,
-nightsLodgeOut,expRestaurants,nightsCampOut,
+nightsLodgeIn,expGas,daysPark,DKexpLocal
+nightsLodgeOut,expRentalCar,overnight,expOtherSpec
+nightsCampIn,expPubTrans,nightsCampIn,
+nightsCampOut,expRestaurants,nightsCampOut,
 nightsCruise,expSnacks,nightsLodgeIn,
 nightsOther,expGroceries,nightsLodgeOut,
 ,expHotels,nightsCruise,
