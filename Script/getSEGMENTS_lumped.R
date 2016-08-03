@@ -57,6 +57,8 @@ for (VAR in small_SEGMENTS){
 
 SEGvars_LUMPED <- unique(SEGvars_LUMPED)
 
+SEGvars <- SEGvars_LUMPED
+SEGvars_on <- SEGvars_LUMPED[SEGvars_LUMPED!="day_local" & SEGvars_LUMPED!="day_nonlocal"]
 
     
  
