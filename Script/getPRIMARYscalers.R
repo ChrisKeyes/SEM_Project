@@ -30,12 +30,12 @@ if(exists("tripPurpose", where = PARKsegments) == TRUE &
 PARKsegments$fullPURPOSE <- ifelse(PARKsegments$tripPurpose == 1, 1, NA)
 
 # Equally important visitor parties:
-PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 2 & PARKsegments$equallyNearby == 0)] <- 2
-PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 2 & PARKsegments$equallyNearby == 1)] <- 3
+PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 2 & PARKsegments$equallyNearby == 0)] <- 3
+PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 2 & PARKsegments$equallyNearby == 1)] <- 2
 
 # Incidental visitor parties:
-PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 3 & PARKsegments$primaryNearby == 0)] <- 4
-PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 3 & PARKsegments$primaryNearby == 1)] <- 5
+PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 3 & PARKsegments$primaryNearby == 0)] <- 5
+PARKsegments$fullPURPOSE[(PARKsegments$tripPurpose == 3 & PARKsegments$primaryNearby == 1)] <- 4
 
 # Incomplete Responses:
 PARKsegments$fullPURPOSE[is.na(PARKsegments$tripPurpose) & PARKsegments$equallyNearby == 0] <- 3
