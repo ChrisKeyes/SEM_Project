@@ -6,7 +6,7 @@ rm(list=union(ls(), ls()))
 # Load the neccessary packages for the following analysis. First, install packages if
 # they have not been installed on local hard drive. 
 source("~/SEM_Project/Script/loadPACKAGES.R")
-library(prettyR)
+
 
 # Set working directory
 setwd("~/SEM_Project")
@@ -37,24 +37,30 @@ source("~/SEM_Project/Script/getGROUPvars.R")
 PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
 PARKsem$totalCovered <- PARKsem$adultsCovered + PARKsem$childrenCovered
 
+#     There are 572 NA's for childrenCovered
+
 PARK_ExpVars <- PARK_ExpVars[PARK_ExpVars != "expLocalTotal"]
 
 PARKsem$expLocalTotal <- rowSums(PARKsem[,PARK_ExpVars], na.rm = TRUE)
 
 attach(PARKsem)
 
-VARS <- c("daysPark", "hoursPark", "nightsLocalArea", "totalCovered")
+VARS <- c("daysPark", "hoursPark", "nightsLocalArea", "totalCovered", "adultsCovered", "childrenCovered")
 
 # Summary statistics table
 describe(PARKsem[VARS], num.desc = c("mean", "median","sd","max", "valid.n"))
 
-B.MAX <- which(daysPark==60)
-B.MAX <- append(B.MAX, which(hoursPark == 25))
-B.MAX <- append(B.MAX, which(nightsLocalArea == 69))
-B.MAX <- append(B.MAX, which(totalCovered == 20))
+B.MAX <-  c(c(which(daysPark==60)),
+          c(which(hoursPark == 25)),
+          c(which(nightsLocalArea == 69)),
+          c(which(totalCovered == 20)),
+          c(which(adultsCovered == 33)),
+          c(which(childrenCovered == 18)))
+
+B.MAX <- unique(B.MAX)
 
 # ****************************************************************************************
-# Histograms:
+# ***** Historgrams *************************************************************************
 
 # dens <- density(daysPark, na.rm = TRUE)
 # H.days <- hist(daysPark, plot = FALSE)
@@ -65,12 +71,15 @@ B.MAX <- append(B.MAX, which(totalCovered == 20))
 # lines(dens, lty = 2, lwd = 2)
 # box()
 
+library(prettyR)
+
 detach(PARKsem)
 
 for(VAR in VARS){
 dens <- density(PARKsem[,VAR], na.rm = TRUE)
-HIST <- hist(PARKsem[,VAR], plot = FALSE)
-hist(PARKsem[,VAR], xlim = range(HIST$breaks, dens$x),
+HIST <- hist(PARKsem[,VAR], breaks = pretty_breaks(n = c(nrow(unique(PARKsem[VAR])))),  plot = FALSE)
+hist(PARKsem[,VAR], breaks = pretty_breaks(n = c(nrow(unique(PARKsem[VAR])))),
+               xlim = range(HIST$breaks, dens$x),
                ylim = range(HIST$density, dens$y),
                xlab = as.character(VAR), ylab = "Density",
                freq = FALSE, main = "")
@@ -81,7 +90,8 @@ box()
 attach(PARKsem)
 
 # ****************************************************************************************
-# Boxplots
+# ***** Boxplots *************************************************************************
+
 # daysPark
 boxplot(daysPark ~ overnight, ylab = "daysPark" , xlab = "overnight")
 numOBS <- 1:length(daysPark)
@@ -119,19 +129,114 @@ identify(rep(1, length(na.omit(totalCovered))), na.omit(totalCovered), labels = 
 B.TC <- c(228,8,516)
 
 # ****************************************************************************************
-lm.1 <- lm(expLocalTotal ~ adultsCovered + childrenCovered + nightsLocalArea + overnight + as.factor(tripPurpose))
-summary(lm.1)
-plot(lm.1, 2)
+# ***** Linear Regression ****************************************************************
+detach(PARKsem)
 
-T.resids <- (fitted(lm.1)-mean(resid(lm.1), na.rm = T))/sd(resid(lm.1), na.rm = T)
-plot(T.resids)
+tempDF <- PARKsem
 
-m <-mean(resid(lm.1), na.rm = TRUE)
-st.dv <- sd(resid(lm.1), na.rm = TRUE)
+# Clean up  a few variables to help with regression
+tempDF$hoursPark <- ifelse(is.na(tempDF$hoursPark)==TRUE, 0, tempDF$hoursPark)
+tempDF$daysPark <- ifelse(is.na(tempDF$daysPark) == TRUE, 0 , tempDF$daysPark)
+tempDF$childrenCovered <- ifelse(is.na(tempDF$childrenCovered) == T, 0 , tempDF$childrenCovered)
+    # Looking at count(numChild), we have frequency of 0 = 643 which is roughly the 
+    # sum of NA's and zeros in childrenCovered
+
+tempDF$totalCovered <- tempDF$adultsCovered + tempDF$childrenCovered
+
+# Simple linear model
+lm.1 <- lm(expLocalTotal ~ totalCovered, data = tempDF)
+lm.2 <- lm(expLocalTotal ~ totalCovered + nightsLocalArea, data = tempDF)
+lm.3 <- lm(expLocalTotal ~ adultsCovered + overnight, data = tempDF)
+lm.4 <- lm(expLocalTotal ~ adultsCovered + daysPark + hoursPark + overnight + local, data = tempDF)
+lm.5 <- lm(expLocalTotal ~ adultsCovered + childrenCovered + overnight + local + nightsLocalArea, data = tempDF)
+lm.6 <- lm(expLocalTotal ~ adultsCovered + childrenCovered + expHotels + nightsLocalArea, data = tempDF)
+
+
+
+fit <- lm.6
+
+summary(fit)
+plot(fit, 2)  
+
+fit.str <- rstudent(fit) # studentized residuals
+plot(fit.str)
+identify(fit.str)
+
+# Below is the exploratory methods outline in 
+#       http://www.statmethods.net/stats/rdiagnostics.html
+
+library(car)
+
+# Assesing outliers using QQplot for normal residuals and Bonferonni p-value for 
+# extreme observations 
+outlierTest(fit)
+
+detach(tempDF)
+tempDF <- tempDF[-c(491, 549, 790),]
+attach(tempDF)
+
+qqPlot(fit, main = "QQ Plot")
+leveragePlots(fit)
+
+
+# Test for influential observations
+# added variable plot
+avPlots(fit)  # similar to leveragePlots()
+
+# Cooks's D Plot, identify obs with D values > 4/(n-k-1)
+cutoff <- 4/((nrow(expLocalTotal) - length(fit$coefficients) - 1))
+plot(fit, which = 4, cook.levels = cutoff)
+# Influence Plots
+influencePlot(fit, id.method = "identify", main = "Influence Plot",
+              sub = "Circle size is proportional to Cook's Distance")
+
+# Check for Normality of Residuals
+qqPlot(fit, main = "QQ Plot") # same plot as 
+
+library(MASS)
+
+fit.str <- studres(fit)
+hist(fit.str, freq = F, main = "Distribution of Studentized Residuals")
+xfit <- seq(min(fit.str), max(fit.str), length = 40)
+yfit <- dnorm(xfit)
+lines(xfit, yfit)
+
+# Check for Heteroskedasticity
+ncvTest(fit)
+spreadLevelPlot(fit)
+
+
+
+
+
+m <-mean(resid(fit), na.rm = TRUE)
+st.dv <- sd(resid(fit), na.rm = TRUE)
 
 range.norm <- c(m - 3.72*st.dv, m + 3.72*st.dv)
 
-dens1 <- density(resid(lm.1), na.rm = TRUE)
+dens1 <- density(resid(fit), na.rm = TRUE)
+dens2 <- dnorm(pretty(range.norm, 200), mean = m, sd = st.dv)
+
+plot(dens1, xlim = range(c(dens1$x, range.norm)),
+            ylim = range(c(dens1$y, dens2)), 
+            xlab = "Residuals", main = "")
+lines(pretty(range.norm, 200), dens2, lty = 2)
+box()
+
+
+fit <- lm(expLocalTotal ~ adultsCovered + childrenCovered + nightsLocalArea + overnight + as.factor(tripPurpose))
+summary(fit)
+plot(fit, 2)
+
+T.resids <- (fitted(fit)-mean(resid(fit), na.rm = T))/sd(resid(fit), na.rm = T)
+plot(T.resids)
+
+m <-mean(resid(fit), na.rm = TRUE)
+st.dv <- sd(resid(fit), na.rm = TRUE)
+
+range.norm <- c(m - 3.72*st.dv, m + 3.72*st.dv)
+
+dens1 <- density(resid(fit), na.rm = TRUE)
 dens2 <- dnorm(pretty(range.norm, 200), mean = m, sd = st.dv)
 
 plot(dens1, xlim = range(c(dens1$x, range.norm)),
