@@ -315,8 +315,6 @@ if (Choice == "no") {
   source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
 }
 
-SEGvars <- SEGvars_LUMPED
-SEGvars_on <- SEGvars_LUMPED[SEGvars_LUMPED!="day_local" & SEGvars_LUMPED!="day_nonlocal"]
 
 # *****************************************************************************************
 #***** Generate Segment Shares Table ******************************************************
