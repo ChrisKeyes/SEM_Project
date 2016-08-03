@@ -31,6 +31,7 @@ for (VAR in EXPvars){
   }
 }
 
+
 for (VAR in SEGMENTvars){
   if (exists(VAR, where = PARKsem) == TRUE){
     PARK_SegmentVars <- append(PARK_SegmentVars, VAR)

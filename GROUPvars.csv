@@ -1,19 +1,19 @@
-SEGMENTvars,EXPENDITUREvars,TripToArea,nonNUMERICvars
-nightsBackcountry,expParkEntrance,hoursPark,DKexpAdditional
-nightsLodgeIn,expGas,daysPark,DKexpLocal
-nightsLodgeOut,expRentalCar,overnight,expOtherSpec
-nightsCampIn,expPubTrans,nightsCampIn,
-nightsCampOut,expRestaurants,nightsCampOut,
-nightsCruise,expSnacks,nightsLodgeIn,
-nightsOther,expGroceries,nightsLodgeOut,
-,expHotels,nightsCruise,
-,expSpecLodge,nightsOther,
-,expcamp,tripPurpose,
-,expRec,equallyNearby,
-,expSouvenirs,primaryNearby,
-,expEqpRental,,
-,expGuides,,
-,expRail,,
-,expOther,,
-,expLocalTotal,,
-,expAdditional,,
+SEGMENTvars,EXPENDITUREvars,EXPENDITUREnames,EXPgroup,TripToArea,nonNUMERICvars,allSEGS,SEGnames
+nightsBackcountry,expParkEntrance,Park Entrance Fee,,hoursPark,DKexpAdditional,day_local,Local Day
+nightsLodgeIn,expGas,Gas,Local Transportation,daysPark,DKexpLocal,day_nonlocal,NL Day
+nightsLodgeOut,expRentalCar,Rental Cars,Local Transportation,overnight,expOtherSpec,ON_LodgeIn,Lodge NPS
+nightsCampIn,expPubTrans,"Taxis, shuttles, public transportation",Local Transportation,nightsCampIn,,ON_LodgeOut,Lodge Out
+nightsCampOut,expRestaurants,Restaurants and bars,Food,nightsCampOut,,ON_Lodge,Lodge
+nightsCruise,expSnacks,Restaurants and bars,Food,nightsLodgeIn,,ON_CampIn,Camp NPS
+nightsOther,expGroceries,Groceries,Food,nightsLodgeOut,,ON_Backcountry,Backcountry NPS
+,expHotels,"Hotels, motels, resorts",Lodging and Camping,nightsCruise,,ON_CampOut,Camp Out
+,expSpecLodge,Specialty Lodging,Lodging and Camping,nightsOther,,ON_Camp,Camp
+,expcamp,Camping Fees,Lodging and Camping,tripPurpose,,ON_Other,Other
+,expRec,Recreation and entertainment,Recreation,equallyNearby,,,
+,expSouvenirs,Souvenirs and other retail,Retail,primaryNearby,,,
+,expEqpRental,Equipment Rental,Recreation,,,,
+,expGuides,Guides and Tour Fees,Recreation,,,,
+,expRail,Cuyahoga Valley Scenic Railroad,Recreation,,,,
+,expOther,Other Expenditures,Other,,,,
+,expLocalTotal,Local Total,,,,,
+,expAdditional,,,,,,
