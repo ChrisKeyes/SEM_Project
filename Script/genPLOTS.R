@@ -109,7 +109,7 @@ ylimit <- ceiling(max(EXPtotals)/1000)+10
 labs <- wrap.labels(names(df),11)
 
 png(file="Plots/TotalSpending.png",width=1400, height=1400*.6, res=200)
-par(mar=c(4,5,5,0),
+par(mar=c(3,5,4,0),
     bty = "n"
 )
 barplot(as.matrix(df3),
@@ -133,7 +133,7 @@ barplot(as.matrix(df3),
         #legend.text = T,
         #args.legend = list(x = ncol(df3)+2, y= ylimit +17, bg = "white", box.col = "white", border = NA),
         names.arg = labs,
-        cex.names = 0.8,
+        cex.names = 0.9,
         #col = brewer.pal(nrow(df3),"Dark2"),
         col = colors3,
         border = "white",
@@ -142,6 +142,6 @@ barplot(as.matrix(df3),
 axis(side = 2, at=axTicks(2), tick = F, las = 1, labels=sprintf("$%s", axTicks(2)))
 #axis(side = 1, at= axTicks(2),labels = labs)
 title(main="Total Visitor Spending", adj=0, cex.main=1.5)
-mtext("Split by local and non-local visitor spending", font=3, adj=0)
+mtext("Dark colors show spending by non-local visitors", font=3, adj=0, cex=.9)
 title(ylab="Spending, $1000 of dollars",line=3.5,font.lab=2)
 dev.off()
