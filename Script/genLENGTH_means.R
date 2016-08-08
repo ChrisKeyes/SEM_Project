@@ -58,7 +58,7 @@ tempDF <- subset(tempDF, tempDF$check == 0)
 tempDF$daysATTR <- ifelse(tempDF$day_local==1, 1, 
                           ifelse(tempDF$day_nonlocal == 1, tempDF$PRIMARYscalers, 0))
 
-tempDF$ON_Any <- rowSums(tempDF[c(SEGvars_on)])
+tempDF$ON_Any <- rowSums(tempDF[c(SEGvars_on)]) # CHRIS: do we have this variable already?
 
 tempDF$nightsATTR <- ifelse(tempDF$ON_Any == 1, tempDF$nightsLocalArea*tempDF$PRIMARYscalers, 0)
 
@@ -74,10 +74,8 @@ for (VAR in SEGvars){
   if(VAR == "day_local"){PARKlength_MEANS["DaysAttributable", VAR] <- 1}
   
   else if (VAR == "day_nonlocal"){PARKlength_MEANS["DaysAttributable", VAR] <-
-                # round(mean(tempDF[tempDF[,VAR]== 1, "daysParkAdj"]*tempDF[tempDF[,VAR]== 1, "PRIMARYscalers"]),2)}
                   round(mean(tempDF[tempDF[,VAR]==1, "daysATTR"]), 2)}
   else {PARKlength_MEANS["NightsAttributable", VAR] <- 
-                # round(mean(tempDF[tempDF[,VAR]== 1, "nightsLocalArea"]*tempDF[tempDF[,VAR]== 1, "PRIMARYscalers"]),2)}}
                   round(mean(tempDF[tempDF[,VAR]==1, "nightsATTR"]), 2)}}
 }
 # #For lenghtVSE, use daysLocalArea for day trips and nightLocalArea for overnight trips

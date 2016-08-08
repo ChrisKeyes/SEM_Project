@@ -23,13 +23,15 @@ tempDF <- subset(tempDF, !is.na(tempDF$adultsCovered))
 # Create a new variable named "totalCovered", which is the sum of 
 # adultsCovered + childrenCovered.  If childrenCovered is NA, then assume 
 # childrenCovered is zero.
+tempDF$childrenCovered <- ifelse(is.na(tempDF$childrenCovered)==T, 0 , tempDF$childrenCovered)
+
 tempDF$totalCovered <- rowSums(tempDF[,c("adultsCovered","childrenCovered")], na.rm=TRUE)
 
 # Loop through segment types (SEGvars) to calculate average party size values by segment 
 # and print them to the PARKparty_MEANS dataframe.
 for (VAR in SEGvars){
   PARKparty_MEANS["n",VAR] <- sum(tempDF[,VAR])
-  PARKparty_MEANS["GroupSize",VAR] <- round(mean(tempDF[tempDF[,VAR]==1,"grpSize"]),2)
+  # PARKparty_MEANS["GroupSize",VAR] <- round(mean(tempDF[tempDF[,VAR]==1,"grpSize"]),2)
   PARKparty_MEANS["TotalCovered",VAR] <- round(mean(tempDF[tempDF[,VAR]==1,"totalCovered"]),2)
   PARKparty_MEANS["NumberSplit",VAR] <- round(mean(tempDF[tempDF[,VAR]==1,"numSplit"],na.rm=T),2)
 }

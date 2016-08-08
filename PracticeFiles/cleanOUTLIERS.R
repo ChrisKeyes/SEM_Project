@@ -6,8 +6,13 @@ rm(list=union(ls(), ls()))
 # Load the neccessary packages for the following analysis. First, install packages if
 # they have not been installed on local hard drive. 
 source("~/SEM_Project/Script/loadPACKAGES.R")
-
-
+library(car)
+library(prettyR)
+library(MASS)
+library(outliers)
+library(stats4)
+library(fitdistrplus)
+library(binom)
 # Set working directory
 setwd("~/SEM_Project")
 
@@ -26,6 +31,100 @@ source("~/SEM_Project/Script/getSEMvars.R")
 source("~/SEM_Project/Script/getGROUPvars.R")
 
 ###########################################################################################
+# Recreate Table 1 from Stynes & White 2006
+localday <- data.frame(matrix(ncol = 5), nrow = 0)
+col.names <- c("All_Cases", "Excluding Outliers-1", "Excluding Outliers-1 Weighted",
+                      "Excluding Outliers-2", "Excluding Outliers-2 Weighted")
+
+colnames(localday) <- col.names
+PARKsegments$expLocalTotal <- ifelse(is.na(PARKsegments$expLocalTotal), 0 , PARKsegments$expLocalTotal)
+summary(PARKsegments$expLocalTotal)
+describe(PARKsegments["expLocalTotal"], num.desc = c("mean", "median","sd","max", "valid.n"))
+
+ldayDF <- PARKsegments[PARKsegments$day_local == 1, ]
+localday["Local_Day",] <- NA
+
+N <- nrow(ldayDF)
+MEAN <- mean(ldayDF$expLocalTotal)
+MEDIAN <- median(ldayDF$expLocalTotal)
+MEAN.trim <- mean(ldayDF$expLocalTotal, trim = .025)
+SD <- sd(ldayDF$expLocalTotal)
+CV <- SD/MEAN
+P <- N/nrow(PARKsegments)
+ERR <- 1.95*(sqrt((P*(1-P))/N))
+
+localday["Local_Day",] <- NA
+localday["N_cases", "All_Cases"] <- N
+localday["Mean", "All_Cases"] <- round(MEAN, 2)
+localday["Median", "All_Cases"] <- round(MEDIAN,2)
+localday["Trimmed_Mean", "All_Cases"] <- round(MEAN.trim,2)
+localday["Standard_Deviation", "All_Cases"] <- round(SD, 2)
+localday["CV", "All_Cases"] <- round(CV,2)
+localday["Percent_Error-(95%)", "All_Cases"] <- percent(ERR)
+
+localday <- localday[-1,]
+
+
+tempDF <- PARKsegments[PARKsegments$day_local == 1, ]
+tempDF <- subset(tempDF, expLocalTotal < 1000)
+summary(tempDF$expLocalTotal)
+
+# unweighted
+N <- nrow(tempDF)
+MEAN <- mean(tempDF$expLocalTotal)
+MEDIAN <- median(tempDF$expLocalTotal)
+MEAN.trim <- mean(tempDF$expLocalTotal, trim = .025)
+SD <- sd(tempDF$expLocalTotal)
+CV <- SD/MEAN
+P <- N/nrow(PARKsegments)
+ERR <- 1.95*(sqrt((P*(1-P))/N))
+
+# weighted
+N <- nrow(tempDF)
+MEAN <- sum(((tempDF$weight)/N)*tempDF$expLocalTotal)
+MEDIAN <- median(tempDF$expLocalTotal)
+MEAN.trim <- weighted.mean(tempDF$expLocalTotal,(tempDF$weight)/N, trim = .025)
+SD <- sd(tempDF$expLocalTotal*(tempDF$weight)/N)
+CV <- SD/MEAN
+P <- N/nrow(PARKsegments)
+ERR <- 1.95*(sqrt((P*(1-P))/N))
+
+# Choose column name 
+col.name <- "All_Cases"
+col.name <- "Excluding Outliers-1"
+col.name <- "Excluding Outliers-1 Weighted"
+col.name <- "Excluding Outliers-2"
+col.name <-  "Excluding Outliers-2 Weighted"
+
+# Fill in table
+localday["N_cases", col.name] <- N
+localday["Mean", col.name] <- round(MEAN, 2)
+localday["Median", col.name] <- round(MEDIAN,2)
+localday["Trimmed_Mean", col.name] <- round(MEAN.trim,2)
+localday["Standard_Deviation", col.name] <- round(SD, 2)
+localday["CV", col.name] <- round(CV,4)
+localday["Percent_Error-(95%)", col.name] <- percent(ERR)
+
+
+
+
+
+
+
+
+
+
+table2 <- data.frame(matrix(ncol = 5), nrow = 0)
+colnames(table2) <- c("All Cases", "Excluding Outliers-1", "Excluding Outliers-1 Weighted",
+                      "Excluding Outliers-2", "Excluding Outliers-2 Weighted")
+
+table1["Local Day",] <-1
+table2["Nonlocal Day",]  <- 3
+
+table3 <- merge(table1, table2, by = column)
+table3 <- rbind(table1, table2)
+
+
 # Variables to check for outliers:
 # daysPark
 # hoursPark
@@ -42,6 +141,7 @@ PARKsem$totalCovered <- PARKsem$adultsCovered + PARKsem$childrenCovered
 PARK_ExpVars <- PARK_ExpVars[PARK_ExpVars != "expLocalTotal"]
 
 PARKsem$expLocalTotal <- rowSums(PARKsem[,PARK_ExpVars], na.rm = TRUE)
+PARKsem$childrenCovered <- ifelse(is.na(PARKsem$childrenCovered) == T, 0 , PARKsem$childrenCovered)
 
 attach(PARKsem)
 
@@ -59,6 +159,44 @@ B.MAX <-  c(c(which(daysPark==60)),
 
 B.MAX <- unique(B.MAX)
 
+detach(PARKsem)
+# ****************************************************************************************
+# Looking at distributions
+# https://cran.r-project.org/web/views/Distributions.html
+var.1 <- na.omit(PARKsem$hoursPark)
+df.1 <- approxfun(density(na.omit(var.1)))
+plot(density(var.1))
+var.1.new <- c(1, 0, 4)
+points(var.1.new, df.1(var.1.new), col = 2)
+
+# plotdist(as.numeric(var.1), histo = TRUE, demp = F)
+var.1 <- as.numeric(ceiling(var.1))
+fit.1 <- fitdist(var.1, "norm")
+summary(fit.1)
+
+par(mfrow = c(2,2))
+plot.legend <- c("Normal")
+denscomp(fit.1, legendtext = plot.legend)
+qqcomp(fit.1, legendtext = plot.legend)
+cdfcomp(fit.1, legendtext = plot.legend)
+ppcomp(fit.1, legendtext = plot.legend)
+
+
+ test <- rlnorm(500, meanlog = mean(var.1), sdlog = sd(var.1))
+ plot(test)
+
+# fg.1 <- fitdist(var.1, "gamma")
+# fln.1 <- fitdist(var.1, "lnorm")
+# 
+# par(mfrow = c(2,2))
+# plot.legend <- c("lognormal", "gamma")
+# denscomp(list(fln.1, fg.1), legendtext = plot.legend)
+# qqcomp(list(fln.1, fg.1), legendtext = plot.legend)
+# cdfcomp(list(fln.1, fg.1), legendtext = plot.legend)
+# ppcomp(list(fln.1, fg.1), legendtext = plot.legend)
+
+
+
 # ****************************************************************************************
 # ***** Historgrams *************************************************************************
 
@@ -71,7 +209,7 @@ B.MAX <- unique(B.MAX)
 # lines(dens, lty = 2, lwd = 2)
 # box()
 
-library(prettyR)
+
 
 detach(PARKsem)
 
@@ -165,7 +303,7 @@ identify(fit.str)
 # Below is the exploratory methods outline in 
 #       http://www.statmethods.net/stats/rdiagnostics.html
 
-library(car)
+
 
 # Assesing outliers using QQplot for normal residuals and Bonferonni p-value for 
 # extreme observations 
@@ -193,7 +331,6 @@ influencePlot(fit, id.method = "identify", main = "Influence Plot",
 # Check for Normality of Residuals
 qqPlot(fit, main = "QQ Plot") # same plot as 
 
-library(MASS)
 
 fit.str <- studres(fit)
 hist(fit.str, freq = F, main = "Distribution of Studentized Residuals")

@@ -94,18 +94,27 @@ PARKsegments$expLocalTotal <- rowSums(PARKsegments[,c(PARKexp)])
 for(VAR in SEGvars){
   PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR] <- round(mean(
         PARKsegments[PARKsegments[,VAR]==1, "expLocalTotal"]), 2)
+  PARKexpBYparty_MEANS["daysLocalArea", VAR] <- PARKlength_MEANS["daysLocalArea", VAR]
+  PARKexpBYparty_MEANS["nightsLocalArea", VAR] <- PARKlength_MEANS["nightsLocalArea", VAR]
+  
+  if (VAR == "day_local" | VAR == "day_nonlocal"){
+  PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
+      round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]*PARKexpBYparty_MEANS["daysLocalArea", VAR],2)}
+
+  else (PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
+    round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]/PARKexpBYparty_MEANS["nightsLocalArea", VAR],2))
+
+# Save script below for future tables
+
   PARKexpBYparty_MEANS["Days_Attributable", VAR] <- round(PARKlength_MEANS["DaysAttributable", VAR], 2)
   PARKexpBYparty_MEANS["Nights_Attributable", VAR] <- round(PARKlength_MEANS["NightsAttributable", VAR], 2)
   
   if (VAR == "day_local" | VAR == "day_nonlocal"){
-  PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
+  PARKexpBYparty_MEANS["ATTR_Exp_Party/Day.Night", VAR] <- 
       round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]*PARKexpBYparty_MEANS["Days_Attributable", VAR],2)}
 
-  else (PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
+  else (PARKexpBYparty_MEANS["ATTR_Exp_Party/Day.Night", VAR] <- 
     round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]/PARKexpBYparty_MEANS["Nights_Attributable", VAR],2))}
-
-
-
 
 
 
