@@ -25,8 +25,10 @@
 # Clear all data in memory 
 rm(list=union(ls(), ls()))
 
-# Load the neccessary packages for the following analysis. First, install packages if
-# they have not been installed on local hard drive. 
+# Source the functions needed and load the neccessary packages for the following analysis. 
+# First, install packages if they have not been installed on local hard drive. 
+source("~/SEM_Project/Script/changeAlpha.R")
+source("~/SEM_Project/Script/wrapLABELS.R")
 source("~/SEM_Project/Script/loadPACKAGES.R")
 
 # Set working directory
@@ -37,16 +39,6 @@ setwd("~/SEM_Project")
 
 source("~/SEM_Project/Script/selectPARK.R")
       
-# # *****************************************************************************************
-# # Upload data sets from "Data" folder to memory.  Store each data set as "PARKdata" 
-# source("~/SEM_Project/Script/getPARKdata.R")
-# 
-#           PARKdata <-    CUVAdata 
-#           PARKname <-  "CUVA"  
-#               rm(CUVAdata,GATEdata,TESTdata,YOSEdata)
-#           
-# # *****************************************************************************************
-          
 # Upload the "SEMvars.csv" to memory and store as a data.frame named SEMvars
 SEMvars <- read.csv("~/SEM_Project/SEMvars.csv")
 
@@ -66,7 +58,7 @@ source("~/SEM_Project/Script/getSEMvars.R")
 source("~/SEM_Project/Script/getGROUPvars.R")
 
 # Using the groups of variables (SEGMENT, EXP, TRIP, PARTY, etc.), identify observations
-# which are incomplete but may be repairable, incomplete and not repairable, or complete 
+# which are incomplete but may be fixable, incomplete and non-fixable, or complete 
 # but with eronious data. First generate a temporary data.frame "tempDF" which is a copy 
 # of PARKsem (no changes are initially made to PARKsem data). tempDF will be updated as
 # observations are adjusted in PARKsem
@@ -82,6 +74,7 @@ BADentryID <- na.omit(tempDF[tempDF$entries > tempDF$daysPark, "ID"])
 
 PARKsem[PARKsem$ID == BADentryID, "entries"] <- PARKsem[PARKsem$ID == BADentryID, "daysPark"] 
 
+# *****************************************************************************************
 # overnight
 
 # For the "overnight" variable:
@@ -259,38 +252,8 @@ source("~/SEM_Project/Script/getPRIMARYscalers.R")
 # For explanation on how these scripts run and how the parameters and tables are 
 # generated, see the comments within the script being soucred.
 
+# *****************************************************************************************
 
-# # *****************************************************************************************
-# #***** Generate Length of Stay Means Table ************************************************
-# # *****************************************************************************************
-# 
-# source("~/SEM_Project/Script/genLENGTH_means.R") 
-# 
-# # *****************************************************************************************
-# #***** Generate Party Size Means Table ****************************************************
-# # *****************************************************************************************
-# 
-# source("~/SEM_Project/Script/genPARTY_means.R") 
-# 
-# # *****************************************************************************************
-# #***** Generate ReEntry Means Table *******************************************************
-# # *****************************************************************************************
-# 
-# source("~/SEM_Project/Script/genReENTRY_means.R") 
-# 
-# # *****************************************************************************************
-# #***** Generate Party Expenditure Means Table *********************************************
-# # *****************************************************************************************
-# 
-# source("~/SEM_Project/Script/genSPENDING_means.R") 
-# 
-# ###########################################################################################
-# ###########################################################################################
-
-# source("~/SEM_Project/Script/writeTABLES.R")
-
-###########################################################################################
-###########################################################################################
 # To address the problem of small sample size in visitor segment categories, we will 
 # consolidate (a.k.a. "lump") together small segments.  The methodology of which segments
 # are lumped together is explained in the "getSEGMENTS_lumped.R" script.
@@ -306,21 +269,16 @@ source("~/SEM_Project/Script/getPRIMARYscalers.R")
 # To Re-Run the scripts which generate the shares and means tables, our lumped 
 # segment variables must be named "SEGvars" to match existing code. Save a copy of
 # SEGvars_LUMPED as SEGvars. Then re-run scripts.
-Choice <- dlgMessage(c("Do you want to 'lump' segments together?"), "yesno",
+Choice.SEG <- dlgMessage(c("Do you want to 'lump' segments together?"), "yesno",
                title = "Lump Segments")$res
 
-if (Choice == "no") {
-  cat("You cancelled the choice\n")
+if (Choice.SEG == "no") {
+  cat("Segments will not be lumped\n")
 } else {
   source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
+  source("~/SEM_Project/Script/genSEGMENT_shares.R") 
 }
 
-
-# *****************************************************************************************
-#***** Generate Segment Shares Table ******************************************************
-# *****************************************************************************************
-
-source("~/SEM_Project/Script/genSEGMENT_shares.R") 
 
 # *****************************************************************************************
 #***** Generate Length of Stay Means Table ************************************************
@@ -346,20 +304,24 @@ source("~/SEM_Project/Script/genReENTRY_means.R")
 
 source("~/SEM_Project/Script/genSPENDING_means.R") 
 
-# ##########################################################################################
-# # Store tables to PARK's "Output/PARK/Segments_Lumped" folder
-# # set the working directory as the folder to write csv to
-# setwd(paste(paste("~/SEM_Project/Output/", PARKname, sep = "/"), "Segments_Lumped" , sep = "/"))
-# 
-# # Write the PARKsem and PARKbads data frames to .csv
-# write.csv(PARKsegments_SHARES, paste(PARKname, "segment_SHARES_Lumped.csv", sep = ""), row.names = TRUE)
-# write.csv(PARKlength_MEANS, paste(PARKname, "length_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
-# write.csv(PARKreEntry_MEANS, paste(PARKname, "reEntry_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
-# write.csv(PARKparty_MEANS, paste(PARKname, "party_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
-# write.csv(PARKspending_MEANS, paste(PARKname, "spending_MEANS_Lumped.csv", sep = ""), row.names = TRUE)
-# 
-# # Set the working directory
-# setwd("~/SEM_Project")
+###########################################################################################
+source("~/SEM_Project/Script/genREPORT_tables.R") 
+source("~/SEM_Project/Script/genPLOTS.R") 
+
+
+
+# The script below produces a popup prompt asking user if they would like to write the 
+# data in memory to .csv files
+
+Choice <- dlgMessage(c("Do you want to write tables to .csv files?"), "yesno",
+               title = "Write Tables")$res
+
+if (Choice == "no") {
+  cat("Tables and data.frames will remain in memory\n")
+} else {
+  source("~/SEM_Project/Script/writeTABLES.R") 
+}
+
 
 
 

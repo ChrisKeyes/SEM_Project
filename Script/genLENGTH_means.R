@@ -18,7 +18,7 @@ PARKlength_MEANS <- data.frame(matrix(ncol = length(SEGvars), nrow=0))
 # subset the PARKsegments dataframe to only include columns needed for length of 
 # stay analysis. Name the temporary data frame tempDF, and generate a vector
 # of variables to subset PARKsegments on named VARS
-VARS <- c("hoursPark","daysPark","nightsLocalArea", "PRIMARYscalers", c(SEGvars))
+VARS <- c("hoursPark","daysPark","nightsLocalArea", "PRIMARYscalers", "local", c(SEGvars))
 tempDF <- subset(PARKsegments, select = VARS)
 
 # Remove any observations from tempDF which do not meet criteria to be used for analysis
@@ -62,6 +62,11 @@ tempDF$ON_Any <- rowSums(tempDF[c(SEGvars_on)]) # CHRIS: do we have this variabl
 
 tempDF$nightsATTR <- ifelse(tempDF$ON_Any == 1, tempDF$nightsLocalArea*tempDF$PRIMARYscalers, 0)
 
+# Generate averages for use in output tables in future script. See "genREPORT_tables.R".
+AVG.daysATTR <- mean(tempDF[tempDF$ON_Any==0, "daysATTR"])
+AVG.nightsATTR <- mean(tempDF[tempDF$ON_Any == 1, "nightsATTR"])  
+      # CHRIS: should we use RSG weights on these values? 
+
 # Loop through segment types (SEGvars) to calculate average length of stay values by segment 
 # and print them to the PARKlength_MEANS dataframe.
 for (VAR in SEGvars){
@@ -77,16 +82,24 @@ for (VAR in SEGvars){
                   round(mean(tempDF[tempDF[,VAR]==1, "daysATTR"]), 2)}
   else {PARKlength_MEANS["NightsAttributable", VAR] <- 
                   round(mean(tempDF[tempDF[,VAR]==1, "nightsATTR"]), 2)}}
-}
-# #For lenghtVSE, use daysLocalArea for day trips and nightLocalArea for overnight trips
-# ifelse(VAR == "day_local"|VAR == "day_nonlocal", 
-#   PARKlength_MEANS["lengthVSE",VAR] <- 
-#                 round(mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]),2),
-#   PARKlength_MEANS["lengthVSE",VAR] <- 
-#                 round(mean(tempDF[tempDF[,VAR]==1,"nightsLocalArea"]),2))
-# 
-#   PARKlength_MEANS["percentDaysInPark",VAR] <- 
-#                 percent(mean(tempDF[tempDF[,VAR]==1,"daysParkAdj"])/
-#                         mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]))
-# }
 
+
+# Repeat exercise above for non-local visitors only.  This is needed for PARK specific tables
+tempDF <- subset(tempDF, local == 0)
+
+PARKlength_MEANS.NL <- data.frame(matrix(ncol = length(SEGvars), nrow = 0))
+  colnames(PARKlength_MEANS.NL) <- SEGvars
+for (VAR in SEGvars){
+  PARKlength_MEANS.NL["daysLocalArea",VAR] <- round(mean(tempDF[tempDF[,VAR]==1,"daysLocalArea"]),2)
+  PARKlength_MEANS.NL["nightsLocalArea",VAR] <- round(mean(tempDF[
+                                                    tempDF[,VAR]==1,"nightsLocalArea"]),2)
+if(VAR == "day_local"){
+    PARKlength_MEANS.NL[,VAR] <- 0}
+
+else if (VAR == "day_nonlocal"){PARKlength_MEANS.NL["DaysAttributable", VAR] <-
+                  round(mean(tempDF[tempDF[,VAR]==1, "daysATTR"]), 2)}
+else {PARKlength_MEANS.NL["NightsAttributable", VAR] <- 
+                  round(mean(tempDF[tempDF[,VAR]==1, "nightsATTR"]), 2)}}
+
+
+}
