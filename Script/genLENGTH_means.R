@@ -28,7 +28,7 @@ tempDF <- subset(PARKsegments, select = VARS)
 
 # In PARKbads_seg, sum across: hoursPark_2, daysPark_1, daysPark_2. Add a column to tempDF
 # named BADlength, which is the sum of the variables above.
-tempDF$BADlength <- PARKbads_seg$hoursPark_2 + PARKbads_seg$daysPark_1 + PARKbads_seg$daysPark_2
+tempDF$BADlength <- PARKbads_seg$hoursPark_2 + PARKbads_seg$daysPark_1 
       tempDF <- subset(tempDF, tempDF$BADlength == 0)
 
 # Create a new variable "daysParkAdj" that estimates number of days in the park. 
@@ -42,7 +42,7 @@ tempDF$daysParkAdj <- ceiling(tempDF$daysParkAdj)
 
 # Create a new variable "daysLocalArea" equal to nightsLocalArea + 1. 
 # NOTE: nightsLocalArea = 0 when all of the accomodation types are NA. 
-tempDF$daysLocalArea <- tempDF$nightsLocalArea +1
+tempDF$daysLocalArea <- tempDF$nightsLocalArea + 1
 
 # Check to make sure that daysParkAdj <= daysLocalArea. Attach a column to tempDF 
 # named "check" and is a dummy variable where:
@@ -84,7 +84,7 @@ for (VAR in SEGvars){
                   round(mean(tempDF[tempDF[,VAR]==1, "nightsATTR"]), 2)}}
 
 
-# Repeat exercise above for non-local visitors only.  This is needed for PARK specific tables
+# Repeat exercise above for non-local visitors only.  This is needed for PARK report tables
 tempDF <- subset(tempDF, local == 0)
 
 PARKlength_MEANS.NL <- data.frame(matrix(ncol = length(SEGvars), nrow = 0))

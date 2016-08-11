@@ -153,3 +153,11 @@ View(table2)
 View(table3)
 View(table4)
 
+# Write tables to .csv files in the output folder: Output/PARK/ReportTables
+file.path <- paste(getwd(), paste("Output", paste(PARKname, "Report_Tables", sep = "/"), sep = "/"), sep = "/")
+
+write.csv(table1, paste(file.path, "table1.csv", sep = "/"), row.names = TRUE) 
+write.csv(table2, paste(file.path, "table2.csv", sep = "/"), row.names = TRUE) 
+write.csv(table3, paste(file.path, "table3.csv", sep = "/"), row.names = TRUE) 
+write.csv(table4, paste(file.path, "table4.csv", sep = "/"), row.names = TRUE) 
+

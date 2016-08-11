@@ -17,6 +17,7 @@ for (VAR in EXPvars){
 
 # Below is a temporary solution to deal with non-numeric expenditures
 PARK_ExpVars <- PARK_ExpVars[PARK_ExpVars != "expOtherSpec" &
-                               PARK_ExpVars != "DKexpLocal"]
+                               PARK_ExpVars != "DKexpLocal" &
+                                PARK_ExpVars != "expLocalTotal"]
 
 rm(GROUPvars, EXPvars, VAR)

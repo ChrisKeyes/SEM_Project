@@ -1,3 +1,5 @@
+# INTRODUCTION --------------------------------------------------------------------------------
+
 # This script is the starting point for the SEM analysis using R. Read through this script
 # for explanations and comments on how the script is running and what assumptions are being
 # made to clean the data and produce the desired parameters.  
@@ -20,7 +22,7 @@
 # correctly. See the NEWDATAworkflow document for additional information.
 
 ################################################################################################
-#***** SECTION I: Upload data sets, select a PARK, subset and assign SEM variable names ********
+# SECTION I - Upload data sets, select a PARK, subset and assign SEM variable names ------------
 
 # Clear all data in memory 
 rm(list=union(ls(), ls()))
@@ -50,8 +52,11 @@ source("~/SEM_Project/Script/getSEMvars.R")
 # At this point, "PARKsem" is a subsetted version of the raw data from PARKdata.  The variables
 # within "PARKsem" have been re-named to the corresponding SEMvars listed in SEMvars.csv.
 
+# Clean up memory
+rm(i, Packages, park, PKG, rowINDEX, VAR, WD, x)
+
 ###########################################################################################
-#***** SECTION II: Identifying Bad Data Points ********************************************
+# SECTION II: Identifying Bad Data Points -------------------------------------------------
 
 # Upload the GROUPvars and create vectors of each variable category. Keep only those variables
 # that are specific to the current park.
@@ -65,7 +70,7 @@ source("~/SEM_Project/Script/getGROUPvars.R")
 tempDF <- PARKsem
 
 # *****************************************************************************************
-# entries
+# entries 
 
 # For observations where entries is greater than DaysinPark, set entries = DaysinPark. 
 # The assumption here is that the respondant misinterpreted the question or gave an 
@@ -75,7 +80,7 @@ BADentryID <- na.omit(tempDF[tempDF$entries > tempDF$daysPark, "ID"])
 PARKsem[PARKsem$ID == BADentryID, "entries"] <- PARKsem[PARKsem$ID == BADentryID, "daysPark"] 
 
 # *****************************************************************************************
-# overnight
+# overnight 
 
 # For the "overnight" variable:
 #       overnight == 1 if respondant stayed in local area overnight
@@ -131,9 +136,14 @@ PARKsem$zip[c(PARKsem[which(PARKsem$zip == " "), "ID"])] <- NA
 source("~/SEM_Project/Script/cleanLOCAL.R")
     
 # *****************************************************************************************
+
 # NOTE: any additional cleaning should go here
     
 # *****************************************************************************************
+
+# Generate the variable "nightsLocalArea" which is the sum of nights across accomodation
+# types
+PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
 
 # The data.frame "PARKsem" is now "cleaned", based on the modest assumptions stated above.
 # Next, the script will generate a matrix with the same dimensions (rows, soreted on ID) as PARKsem named
@@ -148,27 +158,26 @@ source("~/SEM_Project/Script/genBADS.R")
 # Store the "bads" data.frame produced in "genBADS.R" as "PARKbads".
 PARKbads <- Bads
 
-# Remove the "Bads" data.frame from memory. 
-rm(Bads)
- 
+# *****************************************************************************************
+# Identify outliers in the data. See the "cleanOUTLIERS.R" script for full analysis
+# and identification. 
+# NOTE:  the code in "cleanOUTLIERS.R" has the majority of output supressed using 
+# hashtags (comment chunks).  It is not advisable to source the script without 
+# supressing output.
+
+source("~/SEM_Project/Script/cleanOUTLIERS.R")
+
+# Outlying and contaminant data is now identified in PARKbads$Outliers
+# 1 = Outlier
+# 0 o.w.
+
+# Clean up memory. 
+rm(Bads, tempDF, BADentryID, ErrorZip, EXPvars, ID.Excess.Adults1, ID.Excess.Adults2,
+   ID.Excess.Camping, ID.Excess.Spending.ON, ID.Excess.Spending.DAY, ID.Stynes,
+   LocalZip, m, n, nonLocalZip, PARK_localzip, PARK_nonlocalzip, sd.totCov, VAR, ZIPS )
+
 ###########################################################################################
-#***** SECTION III: Subset Data Frame - Drop Bad Data *************************************
-
-# Before modifying data, save data.frames as .csv to the corresponding folder 
-# (e.g. ~/SEM_Project/Output/PARK).
-
-# # *****************************************************************************************
-# # set the working directory as the folder to write csv to
-# setwd(paste("~/SEM_Project/Output", PARKname, sep = "/"))
-# 
-# # Write the PARKsem and PARKbads data frames to .csv
-# write.csv(PARKsem, paste(PARKname, "sem.csv", sep = ""), row.names = FALSE)
-# write.csv(PARKbads, paste(PARKname, "bads.csv", sep = ""), row.names = FALSE)
-# 
-# # Set the working directory
-# setwd("~/SEM_Project")
-# # *****************************************************************************************
-
+# SECTION III: Subset Data Frame - Drop Bad Data ------------------------------------------
 
 # Create a copy of the original PARKsem data frame named "PARKsegments".  
 # The data.frame "PARKsem" should remain unchanged from this point forward (it has been 
@@ -194,19 +203,27 @@ PARKsegments <- PARKsem
 # criteria to be used in the SEM analysis (see "genBADS.R" for additional information on 
 # the conditional checks). 
 PARKsegments$sumBADSsegments <- PARKbads$local_1 +
-                                    PARKbads$overnight_1  +
-                                    PARKbads$overnight_3
+                                PARKbads$overnight_1  +
+                                PARKbads$overnight_3 +
+                                PARKbads$Outliers
     
 # Subset PARKsegments by dropping observations where sumBADSsegments >= 1. 
 PARKsegments <- subset(PARKsegments, sumBADSsegments == 0)
 
 # Store a copy of PARKbads as PARKbads_seg. This new data.frame will contain only those 
 # observations as those in PARKsegments (i.e. drop the same observations). 
-PARKbads_seg <- subset(PARKbads, (local_1 + overnight_1 + overnight_3)==0)
+PARKbads_seg <- subset(PARKbads, (local_1 + overnight_1 + overnight_3 + Outliers)==0)
 
+# Notify user of number of observations dropped
+nDROP <- nrow(PARKsem)-nrow(PARKsegments)
+if(nDROP > 0){print(nDROP)
+  message("Observations have been removed from the data set")}
+
+# Clean up memory
+rm(nDROP)
 
 ###########################################################################################
-#***** SECTION IV: Identify Party Segments, Shares, & Trip Purpose Scalers ****************
+# SECTION IV: Identify Party Segments, Shares, & Trip Purpose Scal ------------------------
 
 # Using the data.frame PARKsegments, categorize each party (observation) by segment type.
 # The script below will generate a column in PARKsegments for each segment type. Each
@@ -245,8 +262,11 @@ source("~/SEM_Project/Script/getPRIMARYscalers.R")
 # large (generally n<30 observations is considered a "small" sample), skip to run the
 # "getSEGMENTS_LUMPED.R" script.
 
+# Clean up memory
+rm(i, IDs_badNights, maxNights, maxNightsType, minNights, SEGMENTvars, v, VAR, wght, x)
+
 ###########################################################################################
-#***** SECTION V: Generate Parameters for SEM *********************************************
+# SECTION V: Generate Parameters for SEM --------------------------------------------------
 
 # The script below will generate the neccessary parameters by sourcing additional scripts.
 # For explanation on how these scripts run and how the parameters and tables are 
@@ -273,12 +293,12 @@ Choice.SEG <- dlgMessage(c("Do you want to 'lump' segments together?"), "yesno",
                title = "Lump Segments")$res
 
 if (Choice.SEG == "no") {
-  cat("Segments will not be lumped\n")
+  message("Segments have not been lumped\n")
 } else {
   source("~/SEM_Project/Script/getSEGMENTS_lumped.R")
   source("~/SEM_Project/Script/genSEGMENT_shares.R") 
+  message("Segments are now lumped\n")
 }
-
 
 # *****************************************************************************************
 #***** Generate Length of Stay Means Table ************************************************
@@ -304,25 +324,36 @@ source("~/SEM_Project/Script/genReENTRY_means.R")
 
 source("~/SEM_Project/Script/genSPENDING_means.R") 
 
+# Clean up memory:
+rm(Choice.SEG, EXP, VAR, VARS)
+
 ###########################################################################################
+# SECTION VI: Generate Plots & Report Tables ----------------------------------------------
+
 source("~/SEM_Project/Script/genREPORT_tables.R") 
 source("~/SEM_Project/Script/genPLOTS.R") 
 
+# Clean up memory:
+rm(EXP, j, RECvisits, VAR, ylimit)
 
+###########################################################################################
+# SECTION VII: Write Data in Memory to Local Drive ---------------------------------------
 
 # The script below produces a popup prompt asking user if they would like to write the 
 # data in memory to .csv files
 
-Choice <- dlgMessage(c("Do you want to write tables to .csv files?"), "yesno",
+Choice.WRITE <- dlgMessage(c("Do you want to write tables to .csv files?"), "yesno",
                title = "Write Tables")$res
 
-if (Choice == "no") {
-  cat("Tables and data.frames will remain in memory\n")
+if (Choice.WRITE == "no") {
+  message("Tables and data.frames will remain in memory\n")
 } else {
+  message("Tables and data.frames have been saved to local drive\n")
   source("~/SEM_Project/Script/writeTABLES.R") 
 }
 
-
+###########################################################################################
+# END
 
 
 

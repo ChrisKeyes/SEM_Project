@@ -11,6 +11,7 @@ PARKexp_TOTAL <- data.frame(matrix(ncol = length(SEGvars), nrow = 0))
     colnames(PARKexp_TOTAL) <- SEGvars
     
 PARKvisits <- 2284612 # CUVA visitors
+
 # Add script to pull total visitation from .csv file
 
 # Fill in total expenditure table.  The first row is the total annual visitors per segment.
