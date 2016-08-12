@@ -102,7 +102,7 @@ tempDF$NIGHTsum <- rowSums(tempDF[PARK_SegmentVars], na.rm = TRUE)
 PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum > 0] <- 1
 
 # For observations where overnight == NA and NIGHTsum = 0 , change overnight to 0
-PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum = 0] <- 0
+PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum == 0] <- 0
 
 # For observations where overnight == 1, but one or more of the accomodation 
 # types is NA, replace with zero. Here, the assumption is that if the respondant identified 
