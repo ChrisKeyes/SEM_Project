@@ -1,0 +1,8 @@
+"","day_local","day_nonlocal","ON_Other","ON_Lodge","ON_Camp"
+"Mean_Total_Expenditure",59.68,67.44,48.74,65.64,58.41
+"daysLocalArea",1,1,5.05,3.14,3.56
+"nightsLocalArea",0,0,4.05,2.14,2.56
+"Mean_Exp_Party/Day.Night",59.68,67.44,12.03,30.67,22.82
+"Days_Attributable",1,0.8,NA,NA,NA
+"Nights_Attributable",NA,NA,2.23,1.58,2.27
+"ATTR_Exp_Party/Day.Night",59.68,53.95,21.86,41.54,25.73
