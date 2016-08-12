@@ -1,0 +1,6 @@
+"Segment","Sample Size","Share","95% CI Lower","95% CI Upper","Method"
+"day_local","513","0.62","0.587","0.653","asymptotic"
+"day_nonlocal","208","0.252","0.222","0.281","asymptotic"
+"ON_Other","19","0.023","0.015","0.036","wilson"
+"ON_Lodge","71","0.086","0.067","0.105","asymptotic"
+"ON_Camp","16","0.019","0.012","0.031","wilson"
