@@ -50,6 +50,8 @@ PARKreEntry_MEANS <- data.frame(matrix(
 for (VAR in SEGvars){
   PARKreEntry_MEANS["n", VAR] <- sum(tempDF[,VAR])
   PARKreEntry_MEANS["Party_reEntry", VAR] <- 
-            round(mean(tempDF[tempDF[,VAR]==1,"entries"]),2)}
+            round(mean(tempDF$entries[tempDF[,VAR]==1]),2)}
 
 }
+
+

@@ -37,7 +37,7 @@ row.names(PARKspending_MEANS) <- PARK_ExpVars
 # person spending averages. 
 
 for (VAR in SEGvars){
-  for (EXP in PARK_ExpVars){
+  for (EXP in PARK_ExpVars[PARK_ExpVars!="expLocalTotal"]){
     PARKspending_MEANS[EXP, VAR] <- round(mean(
           PARKsegments[PARKsegments[,VAR]==1, EXP]), 2)
 }}
@@ -99,7 +99,7 @@ for(VAR in SEGvars){
   
   if (VAR == "day_local" | VAR == "day_nonlocal"){
   PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
-      round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]*PARKexpBYparty_MEANS["daysLocalArea", VAR],2)}
+      round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]/PARKexpBYparty_MEANS["daysLocalArea", VAR],2)}
 
   else (PARKexpBYparty_MEANS["Mean_Exp_Party/Day.Night", VAR] <- 
     round(PARKexpBYparty_MEANS["Mean_Total_Expenditure", VAR]/PARKexpBYparty_MEANS["nightsLocalArea", VAR],2))

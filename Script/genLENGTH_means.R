@@ -35,7 +35,7 @@ tempDF$BADlength <- PARKbads_seg$hoursPark_2 + PARKbads_seg$daysPark_1
 #       If daysPark is greater than zero, daysParkAdj = daysPark. 
 #       If daysPark is greater than zero & hoursPark is greater than 
 #       zero, daysParkAdj = daysPark
-tempDF$daysParkAdj <- ifelse(!is.na(tempDF$daysPark),tempDF$daysPark, 1)
+tempDF$daysParkAdj <- ifelse(is.na(tempDF$daysPark),1 ,tempDF$daysPark)
 
 # Round daysParkAdj to the next integer (e.g. 2.25 = 3)
 tempDF$daysParkAdj <- ceiling(tempDF$daysParkAdj)
@@ -58,7 +58,7 @@ tempDF <- subset(tempDF, tempDF$check == 0)
 tempDF$daysATTR <- ifelse(tempDF$day_local==1, 1, 
                           ifelse(tempDF$day_nonlocal == 1, tempDF$PRIMARYscalers, 0))
 
-tempDF$ON_Any <- rowSums(tempDF[c(SEGvars_on)]) # CHRIS: do we have this variable already?
+tempDF$ON_Any <- rowSums(tempDF[c(SEGvars_on)]) 
 
 tempDF$nightsATTR <- ifelse(tempDF$ON_Any == 1, tempDF$nightsLocalArea*tempDF$PRIMARYscalers, 0)
 

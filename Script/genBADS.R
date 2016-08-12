@@ -136,9 +136,10 @@ Bads$daysPark_1 <- ifelse(is.na(PARKsem$daysPark) &
 #***************************************************************************************************
 # Entries ------------------------------------------------------------------------------------------
 
+if (exists("entries", where = PARKsem) == TRUE){
 # entries_1: check for entries == NA & DKentries == NA
 # These respondents refused to answer the question
-if (exists("entries", where = PARKsem) == TRUE){
+
  
 Bads$entries_1 <- ifelse(is.na(PARKsem$entries) & is.na(PARKsem$DKentries), 1, 0)
 

@@ -38,6 +38,7 @@ row.names(tempDF) <- tempDF$EXPgroup
 # df2 <- tempDF
 
 rorder <- c("Lodging and Camping", "Food", "Local Transportation", "Recreation", "Retail", "Other Expenditures")
+
 tempDF <- tempDF[match(rorder, tempDF$EXPgroup), colnames(tempDF) != "EXPgroup"]
 
 # #remove the expenditure group column

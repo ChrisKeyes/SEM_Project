@@ -32,7 +32,7 @@ for(VAR in SEGvars){
 }}
 
 # Add a rowsum of total expenditures per day accross segments
-table1$All_Visitors <- rowSums(table1, na.rm = TRUE)
+# table1$All_Visitors <- rowSums(table1, na.rm = TRUE)
 
 # CHRIS - use cathy's script to re-order PARK_exp variable names (row names)
 
@@ -41,6 +41,7 @@ table1$All_Visitors <- rowSums(table1, na.rm = TRUE)
 table2 <- data.frame(matrix(ncol = length(SEGvars), nrow = 0))
     colnames(table2) <- SEGvars
 
+table2["Sample Size",] <- PARKsegments_SHARES["n", ]
 table2["Segment_Shares",] <- PARKsegments_SHARES["SEGMENT_share",]
 table2["Re-entry_Rate",] <- PARKreEntry_MEANS["Party_reEntry",]
 table2["Party_Size",] <- PARKparty_MEANS["TotalCovered",]
@@ -67,6 +68,12 @@ for(VAR in SEGvars){
 
 # Add a rowsum of total expenditures per day accross segments
 # table2$All_Visitors <- rowSums(table2)
+
+# Add average days & nights attributable by segments
+for(VAR in SEGvars){
+  table2["Average Days Attributable", VAR] <- PARKlength_MEANS["DaysAttributable", VAR]
+  table2["Average Nights Attributable", VAR] <- PARKlength_MEANS["NightsAttributable", VAR]
+}
 
 # *****************************************************************************************
 # Generate table 3 (Party Day(Night) Attributable)

@@ -75,10 +75,10 @@ tempDF <- PARKsem
 # For observations where entries is greater than DaysinPark, set entries = DaysinPark. 
 # The assumption here is that the respondant misinterpreted the question or gave an 
 # answer which cannot be true. THese observations are identified in PARKbads_seg$entries_3
-BADentryID <- na.omit(tempDF[tempDF$entries > tempDF$daysPark, "ID"])
+BADentryID <- subset(PARKsem, entries > daysPark, ID)
 
-for(i in 1:nrow(PARKsem)){
-PARKsem$entries[i] <- ifelse(PARKsem$entries[i] > PARKsem$daysPark[i], PARKsem$daysPark[i], PARKsem$entries[i])
+for(VAR in BADentryID){
+PARKsem$entries[PARKsem$ID == VAR] <- PARKsem$daysPark[PARKsem$ID == VAR]
 }
 
 # *****************************************************************************************
@@ -142,8 +142,6 @@ source("~/SEM_Project/Script/cleanLOCAL.R")
 # Generate the variable "nightsLocalArea" which is the sum of nights across accomodation
 # types. This is used in the "genBADS.R" script and the following sections.
 PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
-
-# *****************************************************************************************
 
 # *****************************************************************************************
 

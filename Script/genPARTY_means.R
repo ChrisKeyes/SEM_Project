@@ -11,7 +11,7 @@ PARKparty_MEANS <- data.frame(matrix(ncol = length(SEGvars), nrow=0))
 
 # Generate a vector of the variable names needed for party size analysis. Name the
 # vector "VARS"
-VARS <- c("ID","grpSize","adultsCovered","childrenCovered","numSplit", SEGvars)
+VARS <- c("ID","grpSize", "numAdults", "adultsCovered","childrenCovered","numSplit", SEGvars)
 
 # Generate a temporary data.frame from PARKsegments which is subset on VARS and 
 # named "tempDF"
@@ -24,6 +24,9 @@ tempDF <- subset(tempDF, !is.na(tempDF$adultsCovered))
 # adultsCovered + childrenCovered.  If childrenCovered is NA, then assume 
 # childrenCovered is zero.
 tempDF$childrenCovered <- ifelse(is.na(tempDF$childrenCovered)==T, 0 , tempDF$childrenCovered)
+
+# If adultsCovered is zero, change adultsCovered to numAdults
+tempDF$numAdults <- ifelse(tempDF$adultsCovered == 0, tempDF$numAdults, tempDF$adultsCovered)
 
 tempDF$totalCovered <- rowSums(tempDF[,c("adultsCovered","childrenCovered")], na.rm=TRUE)
 

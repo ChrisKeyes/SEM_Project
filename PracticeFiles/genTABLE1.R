@@ -1,5 +1,7 @@
 # Recreate Table 1 from Stynes & White 2006
 # Create each sub-table individually then bind them together
+
+# As of 8/12 - This script is incomplete
 localday <- data.frame(matrix(ncol = 5), nrow = 0)
 col.names <- c("All_Cases", "Excluding Outliers-1", "Excluding Outliers-1 Weighted",
                       "Excluding Outliers-2", "Excluding Outliers-2 Weighted")
