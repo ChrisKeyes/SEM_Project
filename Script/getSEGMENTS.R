@@ -1,5 +1,5 @@
 # This script categorizes each party into their respective segment category. Each segment is 
-# represented as column in PARKsegments and is boolean in its value:
+# represented as column in PARKsegments and is binary in its value:
 # 1 == Respondant is this segment type
 # 0 == Repsondant is not this segment type
 
@@ -27,43 +27,42 @@ PARKsegments$overnight_nonlocal <- ifelse(PARKsegments$local == 0 & PARKsegments
 
 IDs_badNights <- as.character(NULL) # Will capture "ID"s with incomplete data
 
-for (x in 1:length(PARKsegments$ID)){
-  if (as.integer(PARKsegments$overnight[x]) == 1){  # Confine loop to only overnight
-    
-    
+for(x in 1:length(PARKsegments$ID)){
+  if(as.integer(PARKsegments$overnight[x]) == 1){  # Confine loop to only overnight
     maxNightsType <- colnames(PARKsegments[c(x),PARK_SegmentVars])[max.col(PARKsegments[c(x),PARK_SegmentVars],
                                                                            ties.method="first")]
+    maxNightsType.last <- colnames(PARKsegments[c(x),PARK_SegmentVars])[max.col(PARKsegments[c(x),PARK_SegmentVars],
+                                                                            ties.method="last")]
+    
     # maxNightsType: vector specifying the type of accomodation with the largest number of nights provided
-    
-    # NOTE: ties.method = "first" returns the first value in the vector, problem when all accomodation 
-    # types are equal (most likely all zeros)
-    
-    maxNights <- max(PARKsegments[c(x), PARK_SegmentVars])
-    minNights <- min(PARKsegments[c(x), PARK_SegmentVars])
+    maxNights <- max(PARKsegments[c(x), PARK_SegmentVars], na.rm = T)
+    minNights <- min(PARKsegments[c(x), PARK_SegmentVars], na.rm = T)
     # maxNights/minNights: vector specifying the largest/smallest integer value of nights given.
     
     if (is.na(maxNightsType) | 
         as.character(maxNights) == 0 |
-        as.character(maxNights) == as.character(minNights)){ 
+        as.character(maxNights) == as.character(minNights) |
+        maxNightsType != maxNightsType.last){ 
       
-            IDs_badNights <- append(IDs_badNights, as.character(PARKsegments$ID[x])) 
+        IDs_badNights <- append(IDs_badNights, as.character(PARKsegments$ID[x])) 
+          
+          v <- paste("ON", substring(maxNightsType, 7), sep = "_")
+      
+          PARKsegments[x,v] <- 1
+}
               # IDs_badNights: vector of ID's which need to be addressed due to 
               # equal nights in multiple segment categories or missing data that 
               # was not caught by checks
-    }
-    
     else { # If the observation is clean, categorize it accordingly
       v <- paste("ON", substring(maxNightsType, 7), sep = "_")
       
           PARKsegments[x,v] <- 1
-    }
-  }
-}
-
+}}}
 # If any observations were not able to be categorized by segment, stop the script 
 # and give user warning message to check the ID's which are problematic
 
-if(length(IDs_badNights) > 0) stop(
-  "There are ID's which cannot be put into segments. Review 'IDs_badNights' for ID's with issues")
-
+if(length(IDs_badNights) > 0){ 
+  message("The ID's in IDs_badNights, listed below, may not have been assigned the correct segment")
+  print(IDs_badNights)
+}
 ###########################################################################################

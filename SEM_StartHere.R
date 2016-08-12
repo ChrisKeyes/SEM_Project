@@ -77,7 +77,9 @@ tempDF <- PARKsem
 # answer which cannot be true. THese observations are identified in PARKbads_seg$entries_3
 BADentryID <- na.omit(tempDF[tempDF$entries > tempDF$daysPark, "ID"])
 
-PARKsem[PARKsem$ID == BADentryID, "entries"] <- PARKsem[PARKsem$ID == BADentryID, "daysPark"] 
+for(i in 1:nrow(PARKsem)){
+PARKsem$entries[i] <- ifelse(PARKsem$entries[i] > PARKsem$daysPark[i], PARKsem$daysPark[i], PARKsem$entries[i])
+}
 
 # *****************************************************************************************
 # overnight 
@@ -99,8 +101,8 @@ tempDF$NIGHTsum <- rowSums(tempDF[PARK_SegmentVars], na.rm = TRUE)
 # For observations where overnight == NA and NIGHTsum > 0 , change overnight to 1
 PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum > 0] <- 1
 
-        # # For observations where overnight == NA and NIGHTsum = 0 , change overnight to 0
-        # PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum = 0] <- 0
+# For observations where overnight == NA and NIGHTsum = 0 , change overnight to 0
+PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum = 0] <- 0
 
 # For observations where overnight == 1, but one or more of the accomodation 
 # types is NA, replace with zero. Here, the assumption is that if the respondant identified 
@@ -110,7 +112,7 @@ PARKsem["overnight"][is.na(tempDF["overnight"]) & tempDF$NIGHTsum > 0] <- 1
 
 # Loop over the segment variables for the PARK, fill in any NA's with zeros for overnight parties
 for (VAR in PARK_SegmentVars){
-  PARKsem[VAR][PARKsem$overnight == 1 & is.na(PARKsem[VAR])] <- 0
+  PARKsem[VAR][is.na(PARKsem[VAR])] <- 0
 }  
 
 # *****************************************************************************************
@@ -137,13 +139,18 @@ source("~/SEM_Project/Script/cleanLOCAL.R")
     
 # *****************************************************************************************
 
+# Generate the variable "nightsLocalArea" which is the sum of nights across accomodation
+# types. This is used in the "genBADS.R" script and the following sections.
+PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
+
+# *****************************************************************************************
+
+# *****************************************************************************************
+
 # NOTE: any additional cleaning should go here
     
 # *****************************************************************************************
 
-# Generate the variable "nightsLocalArea" which is the sum of nights across accomodation
-# types
-PARKsem$nightsLocalArea <- rowSums(PARKsem[PARK_SegmentVars], na.rm = TRUE)
 
 # The data.frame "PARKsem" is now "cleaned", based on the modest assumptions stated above.
 # Next, the script will generate a matrix with the same dimensions (rows, soreted on ID) as PARKsem named
@@ -170,11 +177,6 @@ source("~/SEM_Project/Script/cleanOUTLIERS.R")
 # Outlying and contaminant data is now identified in PARKbads$Outliers
 # 1 = Outlier
 # 0 o.w.
-
-# Clean up memory. 
-rm(Bads, tempDF, BADentryID, ErrorZip, EXPvars, ID.Excess.Adults1, ID.Excess.Adults2,
-   ID.Excess.Camping, ID.Excess.Spending.ON, ID.Excess.Spending.DAY, ID.Stynes,
-   LocalZip, m, n, nonLocalZip, PARK_localzip, PARK_nonlocalzip, sd.totCov, VAR, ZIPS )
 
 ###########################################################################################
 # SECTION III: Subset Data Frame - Drop Bad Data ------------------------------------------
@@ -219,9 +221,6 @@ nDROP <- nrow(PARKsem)-nrow(PARKsegments)
 if(nDROP > 0){print(nDROP)
   message("Observations have been removed from the data set")}
 
-# Clean up memory
-rm(nDROP)
-
 ###########################################################################################
 # SECTION IV: Identify Party Segments, Shares, & Trip Purpose Scal ------------------------
 
@@ -240,7 +239,7 @@ SEGvars_on <- paste("ON", substring(PARK_SegmentVars, 7), sep = "_")
 SEGvars <- c(SEGvars_day,SEGvars_on)
        
 #     NOTE:
-#     If the script stops and produces a warning message, read the comments 
+#     If the script produces a warning message, read the comments 
 #     found within "IdentifySegments.R" script.  
 
 source("~/SEM_Project/Script/getSEGMENTS.R")
@@ -261,9 +260,6 @@ source("~/SEM_Project/Script/getPRIMARYscalers.R")
 # script below. However, if one or more of the sample sizes per segment is not sufficiently
 # large (generally n<30 observations is considered a "small" sample), skip to run the
 # "getSEGMENTS_LUMPED.R" script.
-
-# Clean up memory
-rm(i, IDs_badNights, maxNights, maxNightsType, minNights, SEGMENTvars, v, VAR, wght, x)
 
 ###########################################################################################
 # SECTION V: Generate Parameters for SEM --------------------------------------------------
@@ -324,17 +320,20 @@ source("~/SEM_Project/Script/genReENTRY_means.R")
 
 source("~/SEM_Project/Script/genSPENDING_means.R") 
 
-# Clean up memory:
-rm(Choice.SEG, EXP, VAR, VARS)
-
 ###########################################################################################
 # SECTION VI: Generate Plots & Report Tables ----------------------------------------------
 
 source("~/SEM_Project/Script/genREPORT_tables.R") 
-source("~/SEM_Project/Script/genPLOTS.R") 
 
-# Clean up memory:
-rm(EXP, j, RECvisits, VAR, ylimit)
+Choice.PLOTS <- dlgMessage(c("Do you want to generate PARK plots?"), "yesno",
+               title = "Write Tables")$res
+
+if (Choice.PLOTS == "no") {
+  message("Plots have not been generated\n")
+} else {
+  message("Plots have been generated and saved to Output/PARK/Plots folder\n")
+  source("~/SEM_Project/Script/genPLOTS.R") 
+}
 
 ###########################################################################################
 # SECTION VII: Write Data in Memory to Local Drive ---------------------------------------
@@ -353,7 +352,7 @@ if (Choice.WRITE == "no") {
 }
 
 ###########################################################################################
-# END
+# END :)
 
 
 

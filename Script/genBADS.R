@@ -5,56 +5,12 @@
 ###################################################################################################
 setwd("~/SEM_Project")
 
-
-# # Upload the CHECKvars csv and store as "CHECKvars"
-# CHECKvars <- read.csv("~/SEM_Project/CHECKVars.csv")
-# 
-# # Each park will have a unique set of SEMvars. Store the vector of SEMvars from CHECKvars and 
-# # drop SEMvars which PARKsem does not contain. 
-# 
-# # First create a vector of the variable names which the park has (do not include "ID")
-# PARKvars <- colnames(PARKsem[which(colnames(PARKsem) != c("ID"))])
-# 
-# # Comparing the PARKvars to the SEMvars within CHECKvars, find those that match and store the 
-# # number of checks that correspond to those variables
-# Matches <- NULL    
-# for (v in PARKvars){
-#   MM <-   grep( v, CHECKvars$SEMvars, ignore.case = TRUE, value = FALSE)
-#   Matches <- append(Matches, MM)
-# }
-#   
-# # Drop the variables from CHECKvars that do not match those in PARKsem
-# CHECKvars <- data.frame(CHECKvars[Matches,])
-# 
-# # Create Data frame for matrix of bads.
-# # First, create a data frame named Bads using the "ID" variable from PARKsem
-# 
-# Bads <- data.frame(PARKsem$ID, row.names = NULL)
-#   colnames(Bads) <- "ID"
-#   Bads$ID <- sort(Bads$ID, decreasing = FALSE)
-# 
-# # Using the matched variables in CHECKvar, create a column for each number of checks listed under
-# # "NumberChecks".  The name of the column is SEMvar_#
-# for (y in 1:length(CHECKvars$SEMvars)){
-#   z <- CHECKvars[c(y),c("NumberChecks")]
-#   if (is.na(z) == "TRUE"){
-#     #do nothing, there is no check on this variable
-#   }
-#   else { #the number of checks will be the number of columns added
-#     for (n in 1:z){
-#       ck = paste( CHECKvars$SEMvars[y] , n, sep = "_") 
-#       Bads[, ck] <- 0
-#     }
-#   }
-# }
-
-# Each column of Bads is a check to be performed on that variable, and specific to each "ID"
-
 Bads <- subset(PARKsem, select = ID)
 
 ####################################################################################################
 # PERFORM CHECKS ON SEM VARIABLES -----------------------------------------------------------------
-################## Location variable checks ########################################################
+# Location variables ------------------------------------------------------------------------------
+
 # Local:
 # Local_1; check for NA
         # check <- PARKsem[is.na(PARKsem$local),"ID"]
@@ -97,11 +53,26 @@ Bads$zip_1 <- ifelse(is.na(PARKsem$zip), 1, 0)
 #***************************************************************************************************
 # Segment Variables --------------------------------------------------------------------------------
 
-# For observations where overnight == NA, find segment variables which are also NA
-# for (VAR in PARK_SegmentVars){
-#     check <- na.omit(PARKsem[with(PARKsem, is.na(overnight) & is.na(PARKsem[VAR])), "ID"])
-#         v <- paste(VAR , "1", sep = "_")
-#           Bads[match(check, PARKsem$ID), c(v) ] <- 1}
+# segment_1:
+# Identify observations where there are duplicate nights by accomodation type (duplicates > 0).
+# These observations need to be assigned a segment type based on predetermined rules which assign
+# the party the higher of the two expenditure profiles.
+
+Bads$segment_1 <- 0
+
+for (x in 1:length(PARKsem$ID)){
+if (as.integer(PARKsem$nightsLocalArea[x]) > 1 &
+      (PARKsem$nightsLocalArea[x] > max(PARKsem[x, PARK_SegmentVars], na.rm = T)) ){  
+
+    maxNightsType <- colnames(PARKsem[c(x),PARK_SegmentVars])[max.col(PARKsem[c(x),PARK_SegmentVars],
+                                                                           ties.method="first")]
+    maxNightsType.last <- colnames(PARKsem[c(x),PARK_SegmentVars])[max.col(PARKsem[c(x),PARK_SegmentVars],
+                                                                           ties.method="last")]
+if (maxNightsType != maxNightsType.last){ 
+
+    Bads[Bads$ID == PARKsem$ID[x], "segment_1"] <- 1
+}}}
+    
 
 #***************************************************************************************************
 # Overnight -----------------------------------------------------------------------------------------
@@ -146,11 +117,6 @@ if (exists("hoursPark", where = PARKsem)==TRUE){
 # Check to see if respondant answered >24 hours
 Bads$hoursPark_2 <- ifelse(is.na(PARKsem$hoursPark)==FALSE & PARKsem$hoursPark > 24, 1, 0)
 
-# check <- na.omit(PARKsem[((PARKsem$hoursPark > 24)==TRUE),"ID"])     
-# 
-# Bads[match(check, PARKsem$ID), "hoursPark_2"]  <- 1
-
-
 #***************************************************************************************************
 # daysPark -----------------------------------------------------------------------------------------
 
@@ -166,15 +132,6 @@ Bads$daysPark_1 <- ifelse(is.na(PARKsem$daysPark) &
 # Bads$daysPark_1[c(check)] <- 1
 
 }
-
-# daysPark_2: Check for outliers (daysPark > 14)
-# NOTE: this was specific to CUVA, what sort of check should be use among all parks?
-
-            # check <- PARKsem[as.numeric(PARKsem$daysPark)> 14,"ID"]    
-            #       check <- na.omit(check)
-            #       
-            # Bads[match(check, PARKsem$ID), "daysPark_2"] <- 1
-            #       
 
 #***************************************************************************************************
 # Entries ------------------------------------------------------------------------------------------

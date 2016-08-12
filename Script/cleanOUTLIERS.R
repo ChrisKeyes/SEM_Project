@@ -29,12 +29,24 @@ tempDF$ADJadultsCovered <- ifelse(tempDF$adultsCovered == 0, 1 , tempDF$adultsCo
 tempDF$ADJtotalCovered <- tempDF$ADJadultsCovered + tempDF$childrenCovered
 
 # Stynes & White Outlier/Contaminant Identification -----------------------
-ID.Excess.Spending.DAY <- as.character(na.omit(tempDF[tempDF$overnight == 0 & tempDF$expLocalTotal > 1000, "ID"]))
-ID.Excess.Spending.ON <- rownames(which(tempDF[tempDF$overnight==1, PARK_ExpVars]>1000, arr.ind = T))
-ID.Excess.Camping <- tempDF[which(tempDF$nightsCampIn > 10, arr.ind = T), "ID"]
-#       CUVA places a 10 day limit on camping within the park 
 
-ID.Stynes <- union(ID.Excess.Camping, union(ID.Excess.Spending.DAY, ID.Excess.Spending.ON))
+if(PARKname=="CUVA"){
+ID.Excess.Spending.DAY <- as.character(na.omit(tempDF[tempDF$nightsLocalArea == 0 & tempDF$expLocalTotal > 1000, "ID"]))
+ID.Excess.Spending.ON <- rownames(which(tempDF[tempDF$nightsLocalArea >=1, PARK_ExpVars]>1000, arr.ind = T))
+# CUVA places 10 day limit on Camp In
+ID.Excess.Camping <- tempDF[which(tempDF$nightsCampIn > 10, arr.ind = T), "ID"]
+}
+
+if(PARKname == "YOSE"){
+ID.Excess.Spending.DAY <- as.character(na.omit(tempDF[tempDF$nightsLocalArea == 0 & tempDF$expLocalTotal > 5000, "ID"]))
+ID.Excess.Spending.ON <- rownames(which(tempDF[tempDF$nightsLocalArea >=1, PARK_ExpVars] > 20000, arr.ind = T))
+# YOSE places 14 day limit on camping during summer months (when survey is taken)
+# and 30 day limit Sept - April
+ID.Excess.Camping <- tempDF[which(tempDF$nightsCampIn > 14, arr.ind = T), "ID"]
+}
+
+ID.Stynes <- union(ID.Excess.Spending.DAY, union(ID.Excess.Spending.ON, ID.Excess.Camping))
+
 
 # tempDF[ID.inspect,]
 
@@ -114,9 +126,36 @@ ID.Stynes <- union(ID.Excess.Camping, union(ID.Excess.Spending.DAY, ID.Excess.Sp
 # 
 # var.3 <- na.omit(tempDF$expLocalTotal)
 # df.1 <- approxfun(density(na.omit(var.3)))
-# plot(density(var.3), main = "Density Distribution of expLocalTotal")
+# plot(density(var.3), main = "Density Distribution of expLocalTotal" ,
+#                      sub = "Observations >3 standard deviations above mean are highlighted",
+#                      xlab = "expLocalTotal")
 # var.3.new <- c(tempDF[tempDF$expLocalTotal > mean(tempDF$expLocalTotal, na.rm = T)+(3*sd(tempDF$expLocalTotal, na.rm = T)), "expLocalTotal"])
 # points(var.3.new, df.1(var.3.new), col = 2)
+# 
+# 
+# var.4 <- na.omit(tempDF$expLocalTotal[tempDF$tripPurpose==1])
+# df.4 <- approxfun(density(na.omit(var.4)))
+# plot(density(var.4), main = "Density Distribution of expLocalTotal for Primary Trips" ,
+#                      sub = "Observations >3 standard deviations above mean are highlighted",
+#                      xlab = "expLocalTotal")
+# var.4.new <- c(tempDF[tempDF$expLocalTotal > mean(tempDF$expLocalTotal, na.rm = T)+(3*sd(tempDF$expLocalTotal, na.rm = T)), "expLocalTotal"])
+# points(var.4.new, df.1(var.4.new), col = 2)
+# 
+# var.5 <- na.omit(tempDF$expLocalTotal[tempDF$tripPurpose==2])
+# df.5 <- approxfun(density(na.omit(var.5)))
+# plot(density(var.5), main = "Density Distribution of expLocalTotal for Primary Trips" ,
+#                      sub = "Observations >3 standard deviations above mean are highlighted",
+#                      xlab = "expLocalTotal")
+# var.5.new <- c(tempDF[tempDF$expLocalTotal > mean(tempDF$expLocalTotal, na.rm = T)+(3*sd(tempDF$expLocalTotal, na.rm = T)), "expLocalTotal"])
+# points(var.5.new, df.1(var.5.new), col = 2)
+# 
+# var.6 <- na.omit(tempDF$expLocalTotal[tempDF$tripPurpose==3])
+# df.6 <- approxfun(density(na.omit(var.6)))
+# plot(density(var.6), main = "Density Distribution of expLocalTotal for Primary Trips" ,
+#                      sub = "Observations >3 standard deviations above mean are highlighted",
+#                      xlab = "expLocalTotal")
+# var.6.new <- c(tempDF[tempDF$expLocalTotal > mean(tempDF$expLocalTotal, na.rm = T)+(3*sd(tempDF$expLocalTotal, na.rm = T)), "expLocalTotal"])
+# points(var.6.new, df.1(var.6.new), col = 2)
 # 
 # # plotdist(as.numeric(var.1), histo = TRUE, demp = F)
 # var.1 <- as.numeric(ceiling(var.1))
@@ -177,7 +216,52 @@ ID.Stynes <- union(ID.Excess.Camping, union(ID.Excess.Spending.DAY, ID.Excess.Sp
 # 
 # identify(x1, y1, labels = tempDF$ID[numOBS[local == 0]])
 # identify(x2, y2, labels = tempDF$ID[numOBS[local == 1]])
+#
+# detach(tempDF)
 # 
+# tempDF2 <- subset(tempDF, is.na(expLocalTotal)==F)
+# 
+# attach(tempDF2)
+# boxplot(expLocalTotal ~ tripPurpose,
+#         ylab = "Total Local Expenditures" ,
+#         xlab = "Trip Purpose",
+#         main = "Total Local Expenditures by Trip Purpose")
+# numOBS <- 1:length(expLocalTotal)
+# x1 <- rep(1, length(expLocalTotal[tripPurpose == 1]))
+# x2 <- rep(2, length(expLocalTotal[tripPurpose == 2]))
+# x3 <- rep(3, length(expLocalTotal[tripPurpose == 3]))
+# 
+# y1 <- expLocalTotal[tripPurpose == 1]
+# y2 <- expLocalTotal[tripPurpose == 2]
+# y3 <- expLocalTotal[tripPurpose == 3]
+# 
+# identify(x1, y1, labels = tempDF$ID[numOBS[tripPurpose == 1]])
+# identify(x2, y2, labels = tempDF$ID[numOBS[tripPurpose == 2]])
+# identify(x3, y3, labels = tempDF$ID[numOBS[tripPurpose == 3]])
+# detach(tempDF2)
+# 
+# tempDF3 <- subset(tempDF2, overnight == 1 )
+# 
+# attach(tempDF3)
+# boxplot(expLocalTotal ~ tripPurpose,
+#         ylab = "Total Local Expenditures" ,
+#         xlab = "Trip Purpose",
+#         main = "Total Local Expenditures by Trip Purpose for Overnight Visitors")
+# numOBS <- 1:length(expLocalTotal)
+# x1 <- rep(1, length(expLocalTotal[tripPurpose == 1]))
+# x2 <- rep(2, length(expLocalTotal[tripPurpose == 2]))
+# x3 <- rep(3, length(expLocalTotal[tripPurpose == 3]))
+# 
+# y1 <- expLocalTotal[tripPurpose == 1]
+# y2 <- expLocalTotal[tripPurpose == 2]
+# y3 <- expLocalTotal[tripPurpose == 3]
+# 
+# identify(x1, y1, labels = ID[numOBS[tripPurpose == 1]])
+# identify(x2, y2, labels = ID[numOBS[tripPurpose == 2]])
+# identify(x3, y3, labels = ID[numOBS[tripPurpose == 3]])
+# 
+# detach(tempDF3)
+
 # # Look into C0480, C0779, C1002, C1173
 # #  C0011 appears valid.
 # 

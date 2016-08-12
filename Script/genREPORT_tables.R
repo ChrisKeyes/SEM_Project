@@ -75,8 +75,9 @@ table3 <- data.frame(matrix(ncol = length(SEGvars), nrow = 0))
     colnames(table3) <- SEGvars
     
 # Write line to pull in total visitation values from PAM's .csv file
-RECvisits <- 2284612 # CUVA visitors
-
+if(PARKname == "CUVA"){RECvisits <- 2284612} 
+if(PARKname == "YOSE"){RECvisits <- 4150217}
+    
 table3["Recreation_Visits",] <- RECvisits*SEGwghts
 table3["Party_Trips",] <- round(table3["Recreation_Visits",]/
                                         PARKreEntry_MEANS["Party_reEntry",]/
@@ -148,10 +149,10 @@ table4$Spending_nonLocal.Visitors <- PARKspending_MEANS.NL$TOTAL
 table4["Total_Visitor_Spending",] <- colSums(table4[c(colnames(table4))])
 
 # *****************************************************************************************
-View(table1)
-View(table2)
-View(table3)
-View(table4)
+# View(table1)
+# View(table2)
+# View(table3)
+# View(table4)
 
 # Write tables to .csv files in the output folder: Output/PARK/ReportTables
 file.path <- paste(getwd(), paste("Output", paste(PARKname, "Report_Tables", sep = "/"), sep = "/"), sep = "/")
