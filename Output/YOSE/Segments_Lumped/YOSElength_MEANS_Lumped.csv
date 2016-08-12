@@ -1,0 +1,7 @@
+"","day_local","day_nonlocal","ON_LodgeIn","ON_LodgeOut","ON_CampIn","ON_CampOut","ON_Other"
+"n",46,85,70,321,94,66,28
+"daysPark",1,1.01,3.4,2.15,3.69,2.24,4.04
+"daysLocalArea",1,1.2,4.27,4.3,4.53,5.2,7.18
+"nightsLocalArea",0,0.2,3.27,3.3,3.53,4.2,6.18
+"DaysAttributable",1,0.75,NA,NA,NA,NA,NA
+"NightsAttributable",NA,NA,3.17,2.83,3.39,3.4,5.33

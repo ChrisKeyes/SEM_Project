@@ -1,0 +1,8 @@
+"","day_local","day_nonlocal","ON_LodgeIn","ON_LodgeOut","ON_CampIn","ON_CampOut","ON_Other"
+"Mean_Total_Expenditure",116.57,785.38,2923.63,2334.74,1004.92,1177.07,1049.56
+"daysLocalArea",1,1.2,4.27,4.3,4.53,5.2,7.18
+"nightsLocalArea",0,0.2,3.27,3.3,3.53,4.2,6.18
+"Mean_Exp_Party/Day.Night",116.57,942.46,894.08,707.5,284.68,280.25,169.83
+"Days_Attributable",1,0.75,NA,NA,NA,NA,NA
+"Nights_Attributable",NA,NA,3.17,2.83,3.39,3.4,5.33
+"ATTR_Exp_Party/Day.Night",116.57,589.03,922.28,825,296.44,346.2,196.92
