@@ -11,15 +11,18 @@
 # This main script provides sufficient explanation of the steps taken and functions used but
 # is intentionally concise.  For additional information, see each script being sourced.
 
-# If you are unfamiliar with the R language, this help file may be useful before reading through
-# the scripts
+# If you are unfamiliar with the R language, the link below has many R resources which may
+# be helpful before reading through the scripts:
+
+#       http://owi.usgs.gov/R/resources.html#r-developers
 
 ################################################################################################
+# Pre-SEM Quality Control ----------------------------------------------------------------------
 
 # Before the script below is run, data sets must have been QC'd to meet minimum requirements
-# found in the NEWDATAworkflow document.  It is essential that ALL DATA in the "Data" folder 
+# found in the preSEM_Workflow document.  It is essential that ALL DATA in the "Data" folder 
 # have undergone this minimum level of "cleaning" for the following SEM analysis to work 
-# correctly. See the NEWDATAworkflow document for additional information.
+# correctly. See the preSEM_Workflow document for additional information.
 
 ################################################################################################
 # SECTION I - Upload data sets, select a PARK, subset and assign SEM variable names ------------

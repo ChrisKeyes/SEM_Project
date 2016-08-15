@@ -1,0 +1,14 @@
+Cathy,
+Below is a set of notes that I wanted to pass along for the SEM_Project:
+
+1. The book I would recommend: "Analysis of Questionnaire Data with R", Bruno Falissard 2012
+
+2. The outliers for CUVA were identified using the 2 rules outlined in Stynes & White, "Reflections on Measuring Recreation and Travel Spending" 2006
+I also dropped obs. where campIn was > 10 as cuva sets a 10 day limit for camping.  
+Observations where totalCovered was > 3 standard deviations above mean were also dropped.  This is more conservative than stynes, who would drop any 
+totalCovered > 7 due to expenditure recall issues.
+
+3. The check segments_1 identifies observations where there are two or more accomodations with the same number of 
+nights entered.  These observations are assigned one of the matching segments, but it is basically random.  The user
+needs to correct these manually.  The script genSEGMENTS.R will notify the user of the ID's.
+
